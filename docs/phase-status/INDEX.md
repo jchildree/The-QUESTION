@@ -39,6 +39,6 @@ No ADRs exist yet, so the gating column is empty for every phase.
 | --------- | ----------------------------------------------------------------- | ----------- |
 | C07-01    | Emission contract spliced into `investigate` + `interrogate-spec` | Pass        |
 | C07-02    | Provenance section applied to `BOARD.md`                          | Pass        |
-| C07-03    | Faceless mode-tracker handshake verified                          | Open        |
+| C07-03    | Faceless mode-tracker handshake verified                          | Pass        |
 | C07-04    | TDD RED + REFACTOR pass on each staged skill                      | Open        |
 | C07-05    | Legacy skills retired after replacements pass `--plugin-dir`      | Open        |
