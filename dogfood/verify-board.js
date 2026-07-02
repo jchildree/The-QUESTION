@@ -35,12 +35,15 @@ let hypotheses = 0;
 let verified = 0;
 
 for (const f of files) {
-  const fm = frontmatter(fs.readFileSync(path.join(vaultDir, f), "utf8"));
+  const fm = frontmatter(
+    fs.readFileSync(path.join(vaultDir, f), "utf8").replace(/^\uFEFF/, "")
+  );
   if (!fm || !fm.id) continue;
-  if (!/^spiffe:\/\/[^/]+\/[^/]+\/[^/]+\/.+$/.test(fm.id))
+  if (!/^spiffe:\/\/[^/]+\/[^/]+\/[^/]+\/[^/]+$/.test(fm.id))
     fail(
       f + ": id is not a spiffe://<domain>/<case>/<kind>/<slug> URI: " + fm.id
     );
+  if (!fm.confidence) fail(f + ": provenance node missing confidence field");
   if (fm.confidence && !LADDER.includes(fm.confidence))
     fail(f + ": confidence not on the ladder: " + fm.confidence);
   if (/\/hypothesis\//.test(fm.id)) hypotheses += 1;
