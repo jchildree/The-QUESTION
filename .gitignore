@@ -2,3 +2,10 @@ node_modules/
 .claude/state/
 *.log
 .DS_Store
+
+# Ignore Smart Environment folder
+.smart-env
+
+# Obsidian: vendored plugin code and volatile UI state stay out; configs and themes are tracked
+.obsidian/workspace.json
+.obsidian/plugins/*/main.js

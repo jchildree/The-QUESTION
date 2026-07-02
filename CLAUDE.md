@@ -13,34 +13,36 @@ The persona is DC Comics' Vic Sage (the Question): a faceless investigator who t
 first answer as a starting point, not a conclusion. Investigate first, build second; trust
 nothing you cannot attribute.
 
-There is no git repository here. The founding intent is in
-`the-question-original-concept.md` (case zero) and, expanded, in
-`the-question-session-2026-06-21/docs/origins/`.
+The repo lives at `github.com/jchildree/The-QUESTION` (default branch `main`; do not edit
+it directly, branch first). The founding intent is in `the-question-original-concept.md`
+(case zero) and, expanded, in `the-question/the-question/docs/origins/`. Phase status is
+tracked in `docs/phase-status/INDEX.md`; phases 01-07 (build through integration and
+retirement) are COMPLETE.
 
-## Repository layout (two trees, one product)
+## Repository layout
 
 - `the-question/the-question/` is the live plugin root (`${CLAUDE_PLUGIN_ROOT}`).
-  Contains `.claude-plugin/plugin.json`, the shared docs (`QUESTION.md`, `BOARD.md`), and
-  the built skills: `interrogate-spec`, `investigate`.
-- `the-question-session-2026-06-21/` is a staged session bundle: work mirrored at its
-  eventual repo paths but not yet spliced into the live tree. It carries the
-  not-yet-merged skills (`investigative-report`, `faceless`, `faceless-commit`,
-  `faceless-review`), the design specs under `docs/superpowers/specs/`, and
-  `patches/board-provenance-section.md` (a splice into `BOARD.md`, not a drop-in file). Its
-  `README.md` is the authoritative map of where each piece lands and what is still owed.
-- The `.zip` files at the root are snapshots of these trees; edit the unpacked
-  directories, not the archives.
-
-When asked to "ship" or "merge" staged work, follow the destination table in
-`the-question-session-2026-06-21/README.md` and respect the retirement gate below.
+  Contains `.claude-plugin/plugin.json`, the shared docs (`QUESTION.md`, `BOARD.md`),
+  the specs under `docs/superpowers/specs/`, and all six skills: `interrogate-spec`,
+  `investigate`, `investigative-report`, `faceless`, `faceless-commit`, `faceless-review`.
+- The 2026-06-21 session bundle and the root `.zip` snapshots were fully merged into the
+  live tree and deleted; git history preserves them.
 
 ## Run / test the plugin
 
-Local dev install (from inside the live plugin tree):
+Local dev install (from the repo root; the flag needs the directory that contains
+`.claude-plugin/`):
 
+```text
+claude --plugin-dir ./the-question/the-question
 ```
-claude --plugin-dir ./the-question
-```
+
+Manifest gotcha: an empty `author.name` in `.claude-plugin/plugin.json` silently disables
+the whole plugin -- no error, skills never register. Keep it non-empty.
+
+Headless testing (`claude -p`) cannot user-invoke skills, and
+`disable-model-invocation: true` hides them from the Skill tool; test on a temp copy of the
+plugin with that flag stripped, or test interactively.
 
 There is no automated test suite. "Testing" a skill means invoking it under `--plugin-dir`
 and confirming it behaves. Per `writing-skills` TDD, a new skill gets a RED baseline plus
@@ -59,7 +61,7 @@ the one mechanical rule (one finding/question at a time; escalate to a single fo
 missing, every skill still runs and just drops the flavor. Never make the persona a hard
 dependency.
 
-### Layer 1 - Provenance (`docs/superpowers/specs/spiffe-provenance.md`)
+### Layer 1 - Provenance (`the-question/the-question/docs/superpowers/specs/spiffe-provenance.md`)
 
 A SPIFFE-inspired addressing plus trust layer. Borrows SPIFFE's data model only
 (ID-as-URI, a verifiable document, trust domains, federation); drops the crypto runtime (no
@@ -82,8 +84,8 @@ Conventions: no folders, Title Case filenames, `[[wikilinks]]` at the bottom of 
 (the wikilinks ARE the red string / crazy wall; Obsidian's graph view renders them). Node
 types: Case, Suspect, Source, Investigation Board Index. Closed cases persist and are never
 deleted, which is what enables cross-case recall (skills search prior Suspects before
-generating new hypotheses). The provenance frontmatter from Layer 1 is the node schema (see
-`patches/board-provenance-section.md`).
+generating new hypotheses). The provenance frontmatter from Layer 1 is the node schema (the
+"Node identity & provenance" section of `BOARD.md`).
 
 ### Layer 3 - Investigative skills
 
@@ -93,21 +95,22 @@ The skills that emit board nodes:
   at a time, each with a recommended answer, waiting for the user between questions. User
   answers land as `source: user`.
 - `investigate` - six-phase root-cause discipline (build a feedback loop, reproduce,
-  hypothesise board-aware, instrument, fix-gate, cleanup). Findings are pinned to the board
+  hypothesis board-aware, instrument, fix-gate, cleanup). Findings are pinned to the board
   live with provenance; the fix-gate forbids applying a fix until the root-cause finding is
   `verified` (green) AND the user consents.
-- `investigative-report` (staged) - turns findings into a sourced written case; tiered
+- `investigative-report` - turns findings into a sourced written case; tiered
   citation gate (hard for findings: must be `verified`; soft for color).
 
-### Layer 4 - Faceless (voice only, staged)
+### Layer 4 - Faceless (voice only)
 
 Three thin persona wrappers (`faceless`, `faceless-commit`, `faceless-review`) that
 re-voice the existing caveman compression engine - colder face, same mechanics. Critical
 constraint: the engine (`hooks/caveman-mode-tracker.js`, `hooks/caveman-stats.js`, the
 Python package) is untouched, and `faceless` must still register as caveman mode internally
-or the stats hook goes blind. Keep the engine's level vocabulary exactly
-(`lite`/`full`/`ultra`/`wenyan-*`). This layer is voice, not investigation - no coupling to
-the board/provenance layers.
+or the stats hook goes blind (the bridge is `.claude/hooks/faceless-mode-tracker.js`,
+registered before the caveman tracker in `UserPromptSubmit`). Keep the engine's level
+vocabulary exactly (`lite`/`full`/`ultra`/`wenyan-*`). This layer is voice, not
+investigation - no coupling to the board/provenance layers.
 
 ## The emission contract (the cross-cutting rule)
 
@@ -127,9 +130,11 @@ the splice is one emit-per-contract line at each named phase.
   natural-language triggers - this is how the skill is matched), `category`, and
   `dependencies: []`. Built skills also set `disable-model-invocation: true` and a
   `cache_key`. Match the existing shape when adding a skill.
-- Retirement gate: each replaced legacy skill (`grill-me`, `diagnose`, `caveman*`) in
-  `/mnt/skills/user/` is deleted only after its replacement passes `--plugin-dir` testing.
-  Until then the original stays live. Do not delete a legacy skill preemptively.
+- Retirement gate (satisfied 2026-07-02, keep for future replacements): a legacy skill is
+  deleted only after its replacement passes `--plugin-dir` testing. `grill-me`, `diagnose`,
+  `caveman`, `caveman-commit`, `caveman-review` are retired from `.claude/skills/`;
+  `caveman-compress`, `caveman-help`, `caveman-stats` stay (`compress` mode depends on its
+  skill file, and the engine hooks remain live).
 - Skills reference shared docs by absolute plugin path: `${CLAUDE_PLUGIN_ROOT}/QUESTION.md`,
   `${CLAUDE_PLUGIN_ROOT}/BOARD.md`.
 
