@@ -16,6 +16,7 @@ No ADRs exist yet, so the gating column is empty for every phase.
 | 05    | Investigative-Report Skill (staged)                  | COMPLETE | --          | Session 2026-06-21 |
 | 06    | Faceless Layer (staged)                              | COMPLETE | --          | Session 2026-06-21 |
 | 07    | Integration and Retirement                           | COMPLETE | --          | Session 2026-06-21 |
+| 08    | Dogfood (investigate end-to-end)                     | FOCUS    | --          | Plan 2026-07-02    |
 
 ## Phase Notes
 
@@ -64,3 +65,11 @@ No ADRs exist yet, so the gating column is empty for every phase.
   `caveman-stats` (not in the retirement list; `compress` mode still depends on its skill).
 - Engine intact post-retirement: `caveman-activate.js` falls back to its hardcoded ruleset;
   `caveman-mode-tracker.js` reinforcement unchanged (both re-run and verified).
+
+## Exit Criteria -- Phase 08 (FOCUS -> COMPLETE)
+
+| Criterion | Description                                                       | Pass / Open |
+| --------- | ----------------------------------------------------------------- | ----------- |
+| C08-01    | Fixture bug reproduces deterministically (`node test.js` exits 1) | Open        |
+| C08-02    | Headless investigate run emits board nodes into the fixture vault | Open        |
+| C08-03    | `verify-board.js` passes: SVID schema, spiffe IDs, ladder, gate   | Open        |
