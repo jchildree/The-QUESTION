@@ -43,6 +43,15 @@
                                                "hooks":  [
                                                              {
                                                                  "type":  "command",
+                                                                 "command":  "node \"C:\\Users\\GreenSide\\repos\\The Question\\.claude\\hooks\\faceless-mode-tracker.js\"",
+                                                                 "timeout":  5000
+                                                             }
+                                                         ]
+                                           },
+                                           {
+                                               "hooks":  [
+                                                             {
+                                                                 "type":  "command",
                                                                  "command":  "node \"C:\\Users\\GreenSide\\repos\\The Question\\.claude\\hooks\\caveman-mode-tracker.js\"",
                                                                  "timeout":  5000
                                                              }
