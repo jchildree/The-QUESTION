@@ -9,3 +9,6 @@ node_modules/
 # Obsidian: vendored plugin code and volatile UI state stay out; configs and themes are tracked
 .obsidian/workspace.json
 .obsidian/plugins/*/main.js
+
+# Dogfood: board vault is generated per run, reset before each run
+dogfood/fixture/docs/

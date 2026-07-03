@@ -16,6 +16,7 @@ No ADRs exist yet, so the gating column is empty for every phase.
 | 05    | Investigative-Report Skill (staged)                  | COMPLETE | --          | Session 2026-06-21 |
 | 06    | Faceless Layer (staged)                              | COMPLETE | --          | Session 2026-06-21 |
 | 07    | Integration and Retirement                           | COMPLETE | --          | Session 2026-06-21 |
+| 08    | Dogfood (investigate end-to-end)                     | COMPLETE | --          | Plan 2026-07-02    |
 
 ## Phase Notes
 
@@ -64,3 +65,25 @@ No ADRs exist yet, so the gating column is empty for every phase.
   `caveman-stats` (not in the retirement list; `compress` mode still depends on its skill).
 - Engine intact post-retirement: `caveman-activate.js` falls back to its hardcoded ruleset;
   `caveman-mode-tracker.js` reinforcement unchanged (both re-run and verified).
+
+## Exit Criteria -- Phase 08 (closed 2026-07-02, FOCUS -> COMPLETE)
+
+| Criterion | Description                                                       | Pass / Open |
+| --------- | ----------------------------------------------------------------- | ----------- |
+| C08-01    | Fixture bug reproduces deterministically (`node test.js` exits 1) | Pass        |
+| C08-02    | Headless investigate run emits board nodes into the fixture vault | Pass        |
+| C08-03    | `verify-board.js` passes: SVID schema, spiffe IDs, ladder, gate   | Pass        |
+
+### C08 evidence (headless dogfood run, 2026-07-02)
+
+- C08-01: `node dogfood/fixture/test.js` fails deterministically (off-by-one divisor),
+  exit 1.
+- C08-02: headless `investigate` run under `--plugin-dir` emitted 6 board notes into
+  `dogfood/fixture/docs/Obsidian Vault/The Question/` (Index, Case, 1 Confirmed green
+  Suspect, 3 Ruled Out Suspects). Root cause named: `stats.js:4` divides by
+  `values.length + 1`. Fix-gate held: fixture still fails, `stats.js` unmodified.
+- C08-03: `node dogfood/verify-board.js` -> `PASS: 6 notes, 4 hypotheses, 1 verified`,
+  exit 0. Green node carries all six SVID fields with a re-runnable `verify`.
+- Harness: temp plugin copy with `disable-model-invocation` stripped (same caveat as
+  C07-04) plus `--permission-mode acceptEdits` -- plan-mode default otherwise blocks
+  board writes and ends the headless session empty.
