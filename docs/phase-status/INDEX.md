@@ -17,6 +17,7 @@ No ADRs exist yet, so the gating column is empty for every phase.
 | 06    | Faceless Layer (staged)                              | COMPLETE | --          | Session 2026-06-21 |
 | 07    | Integration and Retirement                           | COMPLETE | --          | Session 2026-06-21 |
 | 08    | Dogfood (investigate end-to-end)                     | COMPLETE | --          | Plan 2026-07-02    |
+| 09    | Publish (marketplace + 1.0.0 release)                | FOCUS    | --          | Plan 2026-07-02    |
 
 ## Phase Notes
 
@@ -87,3 +88,11 @@ No ADRs exist yet, so the gating column is empty for every phase.
 - Harness: temp plugin copy with `disable-model-invocation` stripped (same caveat as
   C07-04) plus `--permission-mode acceptEdits` -- plan-mode default otherwise blocks
   board writes and ends the headless session empty.
+
+## Exit Criteria -- Phase 09 (FOCUS -> COMPLETE)
+
+| Criterion | Description                                                        | Pass / Open |
+| --------- | ------------------------------------------------------------------ | ----------- |
+| C09-01    | Root marketplace.json validates: local add + install + skills load | Open        |
+| C09-02    | README rewritten: marketplace install, six live skills, no stale   | Open        |
+| C09-03    | plugin.json at 1.0.0; v1.0.0 tag and GitHub release published      | Open        |
