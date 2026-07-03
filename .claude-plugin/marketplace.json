@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "the-question",
+  "description": "Root-truth investigation, spec interrogation, and evidence-backed writing -- faceless, relentless, precise.",
+  "owner": {
+    "name": "Scythe",
+    "url": "https://github.com/jchildree"
+  },
+  "plugins": [
+    {
+      "name": "the-question",
+      "description": "Vic Sage investigation discipline: interrogate specs, investigate root causes with a provenance-backed case board, write sourced reports, faceless voice.",
+      "source": "./the-question/the-question",
+      "category": "engineering"
+    }
+  ]
+}
