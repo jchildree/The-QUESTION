@@ -2,7 +2,7 @@
 
 > **Who are you to ask me a question? I'm THE QUESTION!!!**
 
-A Claude Code plugin built around **DC Comics' --Vic Sage--** — a faceless investigator who treats the first answer as a starting point, not a conclusion. Investigate first, build second; trust nothing you cannot attribute.
+A Claude Code plugin built around **DC Comics' ---Vic Sage---** — a faceless investigator who treats the first answer as a starting point, not a conclusion. Investigate first, build second; trust nothing you cannot attribute.
 
 ---
 
