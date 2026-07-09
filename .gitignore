@@ -6,9 +6,20 @@ node_modules/
 # Ignore Smart Environment folder
 .smart-env
 
-# Obsidian: vendored plugin code and volatile UI state stay out; configs and themes are tracked
+# Obsidian: vendored plugin code and volatile UI state stay out; configs are tracked selectively
+.obsidian/
 .obsidian/workspace.json
 .obsidian/plugins/*/main.js
 
+# Claude IDE local state - user-specific configuration, not project-tracked
+.claude/
+
+# Agent configuration directories - local IDE settings
+.agents/
+.codex/
+
 # Dogfood: board vault is generated per run, reset before each run
 dogfood/fixture/docs/
+
+# Scratch space - temporary working area
+.scratch/
