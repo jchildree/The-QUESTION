@@ -1,3 +1,6 @@
+<img width="1122" height="1402" alt="ChatGPT Image Jul 9, 2026, 12_47_47 AM" src="https://github.com/user-attachments/assets/af25d1ef-2013-46f7-b850-60730407446a" />
+
+
 # The Question
 
 > **Who are you to ask me a question? I'm THE QUESTION!!!**
