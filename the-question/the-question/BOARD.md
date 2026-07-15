@@ -18,7 +18,7 @@ investigation happens in, per `obsidian-vault`'s existing rule (repo has a
 
 ## Note Types
 
-**Case** (`Case: <title>.md`) -- symptom, timeline/repro steps, status
+**Case** (`Case- <title>.md`) -- symptom, timeline/repro steps, status
 (`Open` / `Closed`), wikilinks down to every Suspect or Source raised
 during the investigation.
 
