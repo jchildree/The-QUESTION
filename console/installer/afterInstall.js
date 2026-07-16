@@ -4,18 +4,13 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
-module.exports = async function afterInstall(context) {
-  const isWindows =
-    context.targets?.[0]?.name === "nsis" || process.platform === "win32";
-  if (!isWindows) return;
+module.exports = async function afterInstall(_context) {
+  if (process.platform !== "win32") return;
 
-  // Source: plugin files bundled inside the installer resources
-  const pluginSrc = path.join(
-    context.appOutDir ?? context.installPath ?? "",
-    "..",
-    "resources",
-    "plugin"
-  );
+  // Source: bundled inside the installer at resources/plugin (relative to this hook file)
+  // __dirname is <installDir>/resources/app.asar.unpacked/installer or similar;
+  // the extraFiles entry places plugin at <installDir>/resources/plugin.
+  const pluginSrc = path.join(__dirname, "..", "plugin");
 
   // Target: user's Claude Code plugins directory
   // Claude Code on Windows stores plugins at %USERPROFILE%\.claude\plugins\
@@ -46,7 +41,7 @@ module.exports = async function afterInstall(context) {
     );
   } catch (err) {
     // Non-fatal: installer succeeds even if plugin copy fails
-    console.error("[afterInstall] Plugin copy failed:", err.message);
+    console.error("[afterInstall] Plugin copy failed:", err);
   }
 };
 
