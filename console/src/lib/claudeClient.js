@@ -45,7 +45,11 @@ export function queryClaude({
 }) {
   const boardContext = buildBoardContext(nodes);
 
-  // Register listeners BEFORE invoking so we don't miss early chunks
+  // Clear any leftover listeners from a previous call before registering new ones
+  window.electronAPI.removeListeners("claude:chunk");
+  window.electronAPI.removeListeners("claude:done");
+  window.electronAPI.removeListeners("claude:error");
+
   window.electronAPI.onClaudeChunk((data) => onChunk?.(data.text));
 
   window.electronAPI.onClaudeDone((data) => {

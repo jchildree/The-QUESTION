@@ -3,6 +3,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const os = require("os");
 
 const Store = require("electron-store").default;
 const store = new Store();
@@ -90,7 +91,7 @@ function createWindow() {
     width: 1280,
     height: 800,
     webPreferences: {
-      preload: path.join(__dirname, "dist-electron", "preload.cjs"),
+      preload: path.join(__dirname, "preload.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -204,14 +205,14 @@ ipcMain.handle(
     // Load QUESTION.md for system prompt
     let systemPrompt = "";
     const devPath = path.join(
-      process.cwd(),
+      __dirname,
       "..",
       "the-question",
       "the-question",
       "QUESTION.md"
     );
     const prodPath = process.resourcesPath
-      ? path.join(process.resourcesPath, "question.md")
+      ? path.join(process.resourcesPath, "plugin", "QUESTION.md")
       : null;
 
     for (const candidate of [devPath, prodPath].filter(Boolean)) {
@@ -265,10 +266,40 @@ ipcMain.handle(
 );
 
 // ---------------------------------------------------------------------------
+// Plugin copy (runs on first launch; installer can't do this via electron-builder)
+// ---------------------------------------------------------------------------
+
+function copyDirSync(src, dest) {
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const s = path.join(src, entry.name);
+    const d = path.join(dest, entry.name);
+    if (entry.isDirectory()) copyDirSync(s, d);
+    else fs.copyFileSync(s, d);
+  }
+}
+
+function copyPluginIfNeeded() {
+  if (process.platform !== "win32") return;
+  const dest = path.join(os.homedir(), ".claude", "plugins", "the-question");
+  if (fs.existsSync(dest)) return;
+  const src = app.isPackaged
+    ? path.join(process.resourcesPath, "plugin")
+    : path.join(__dirname, "..", "the-question", "the-question");
+  if (!fs.existsSync(src)) return;
+  try {
+    copyDirSync(src, dest);
+  } catch (err) {
+    console.error("[plugin-copy] failed:", err);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // App lifecycle
 // ---------------------------------------------------------------------------
 
 app.whenReady().then(() => {
+  copyPluginIfNeeded();
   createWindow();
 
   app.on("activate", () => {
