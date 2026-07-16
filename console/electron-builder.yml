@@ -1,0 +1,27 @@
+appId: com.thequestion.console
+productName: The Question Console
+
+directories:
+  output: release/
+
+files:
+  - dist/**
+  - dist-electron/**
+
+extraFiles:
+  - from: ../the-question/the-question
+    to: resources/plugin
+    filter:
+      - "**/*"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+afterInstall: installer/afterInstall.js
