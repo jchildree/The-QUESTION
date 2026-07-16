@@ -54,16 +54,12 @@ export function parseMarkdownLines(content) {
     if (!frontmatterDone) {
       if (!inFrontmatter && line.trim() === "---") {
         inFrontmatter = true;
-        result.push({ type: "frontmatter" });
         continue;
       }
       if (inFrontmatter) {
         if (line.trim() === "---") {
           inFrontmatter = false;
           frontmatterDone = true;
-          result.push({ type: "frontmatter" });
-        } else {
-          result.push({ type: "frontmatter" });
         }
         continue;
       }
@@ -112,7 +108,7 @@ export function parseMarkdownLines(content) {
 
     // -- List items --
     if (line.startsWith("* ") || line.startsWith("- ")) {
-      const text = line.startsWith("* ") ? line.slice(2) : line.slice(2);
+      const text = line.slice(2);
       result.push({ type: "list", text, links: extractInlineLinks(text) });
       continue;
     }
@@ -169,7 +165,7 @@ export function extractInlineLinks(text) {
 export function formatNewNodeContent(type, title, timestamp) {
   const slug = title.toLowerCase().replace(/\s+/g, "-");
   const id = `spiffe://the-question/${type.toLowerCase()}-${Date.now()}/case/${slug}`;
-  const frontmatter = `---\nid: ${id}\nasserted: ${timestamp}\nmethod: observed\nconfidence: unverified\n---\n`;
+  const frontmatter = `---\nid: ${id}\nasserted: ${timestamp}\nsource: ""\nmethod: observed\nconfidence: unverified\nverify: ""\n---\n`;
 
   if (type === "Case") {
     return `${frontmatter}# Case: ${title}\n\n**Status**: Open\n**Symptom**: \n\n## Timeline & Repro\n\n## Links\n`;
