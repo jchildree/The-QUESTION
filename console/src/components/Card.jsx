@@ -61,7 +61,7 @@ export default function Card({
   };
 
   return (
-    <View style={cardStyle}>
+    <TouchableOpacity style={cardStyle} onPress={onPress} activeOpacity={1}>
       {/* Pushpin */}
       <View
         style={{
@@ -256,6 +256,6 @@ export default function Card({
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
