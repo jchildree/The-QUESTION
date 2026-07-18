@@ -156,6 +156,24 @@ ipcMain.handle("vault:write", async (_event, { fileName, content }) => {
   }
 });
 
+ipcMain.handle("board:read", async () => {
+  return store.get("boardLayout", { positions: {}, manualEdges: [] });
+});
+
+ipcMain.handle("board:write", async (_event, layout) => {
+  store.set("boardLayout", layout);
+  return { ok: true };
+});
+
+ipcMain.handle("postits:read", async () => {
+  return store.get("postIts", []);
+});
+
+ipcMain.handle("postits:write", async (_event, postIts) => {
+  store.set("postIts", postIts);
+  return { ok: true };
+});
+
 ipcMain.handle("vault:watch", async () => {
   const vaultPath = store.get("vaultPath");
   if (!vaultPath) return { ok: false };

@@ -26,6 +26,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.on("claude:error", (_event, data) => callback(data));
   },
 
+  // Board layout persistence
+  readBoard: () => ipcRenderer.invoke("board:read"),
+  writeBoard: (layout) => ipcRenderer.invoke("board:write", layout),
+
+  // Sticky note persistence
+  readPostIts: () => ipcRenderer.invoke("postits:read"),
+  writePostIts: (postIts) => ipcRenderer.invoke("postits:write", postIts),
+
   // Cleanup - remove all listeners for a channel
   removeListeners: (channel) => ipcRenderer.removeAllListeners(channel),
 });

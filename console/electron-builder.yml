@@ -1,5 +1,6 @@
 appId: com.thequestion.console
 productName: The Question Console
+icon: build/icon.png
 
 directories:
   output: release/

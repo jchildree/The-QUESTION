@@ -198,7 +198,7 @@ export default function MarkdownEditor({ node, onSelectFile, onWriteFile }) {
             color: "#e2e8f0",
             fontFamily: "monospace",
             fontSize: 13,
-            lineHeight: 22,
+            lineHeight: "22px",
             backgroundColor: "#020617",
             border: "none",
             outline: "none",
@@ -476,7 +476,7 @@ function renderInlineText(text, links, onSelectFile) {
           color: "#cbd5e1",
           fontFamily: "monospace",
           fontSize: 13,
-          lineHeight: 22,
+          lineHeight: "22px",
         }}
       >
         {text}
@@ -499,7 +499,7 @@ function renderInlineText(text, links, onSelectFile) {
             color: "#cbd5e1",
             fontFamily: "monospace",
             fontSize: 13,
-            lineHeight: 22,
+            lineHeight: "22px",
           }}
         >
           {remaining.slice(0, splitAt)}
@@ -513,7 +513,7 @@ function renderInlineText(text, links, onSelectFile) {
           color: "#f43f5e",
           fontFamily: "monospace",
           fontSize: 13,
-          lineHeight: 22,
+          lineHeight: "22px",
           fontWeight: "bold",
           cursor: "pointer",
         }}
@@ -538,7 +538,7 @@ function renderInlineText(text, links, onSelectFile) {
           color: "#cbd5e1",
           fontFamily: "monospace",
           fontSize: 13,
-          lineHeight: 22,
+          lineHeight: "22px",
         }}
       >
         {remaining}

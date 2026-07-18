@@ -10,16 +10,20 @@ export default function PostIt({ note, onDragStart, onRemove }) {
 
   return (
     <div
+      onMouseDown={onDragStart}
       style={{
         position: "absolute",
         left: note.x,
         top: note.y,
-        width: 200,
+        minWidth: 200,
+        maxWidth: 320,
         transform: `rotate(${note.rotate ?? 0}deg)`,
         backgroundColor: colors.bg,
         border: `1px solid ${colors.border}`,
         boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
         padding: 14,
+        cursor: "grab",
+        userSelect: "none",
       }}
     >
       <div
@@ -35,19 +39,18 @@ export default function PostIt({ note, onDragStart, onRemove }) {
         }}
       />
 
-      <div onMouseDown={onDragStart}>
-        <div
-          style={{
-            color: colors.text,
-            fontFamily: "serif",
-            fontStyle: "italic",
-            fontSize: 13,
-            lineHeight: 20,
-            marginTop: 8,
-          }}
-        >
-          "{note.text}"
-        </div>
+      <div
+        style={{
+          color: colors.text,
+          fontFamily: "serif",
+          fontStyle: "italic",
+          fontSize: 13,
+          lineHeight: "1.5",
+          wordBreak: "break-word",
+          marginTop: 8,
+        }}
+      >
+        "{note.text}"
       </div>
 
       <div
@@ -73,6 +76,7 @@ export default function PostIt({ note, onDragStart, onRemove }) {
         </div>
         <button
           type="button"
+          onMouseDown={(e) => e.stopPropagation()}
           onClick={onRemove}
           style={{
             background: "none",

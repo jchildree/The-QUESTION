@@ -14,13 +14,30 @@ export default function CrazyBoard({
   onOpenEditor,
   onWriteFile,
   apiKey,
+  positions,
+  setPositions,
+  manualEdges,
+  setManualEdges,
 }) {
-  const [positions, setPositions] = useState({});
-  const [manualEdges, setManualEdges] = useState([]);
   const [postIts, setPostIts] = useState([]);
   const [dragging, setDragging] = useState(null);
   const boardRef = useRef(null);
   const [linkingSource, setLinkingSource] = useState(null);
+  const [postItInput, setPostItInput] = useState(null);
+
+  useEffect(() => {
+    window.electronAPI?.readPostIts?.().then((saved) => {
+      if (saved?.length) setPostIts(saved);
+    });
+  }, []);
+
+  // ponytail: debounce prevents a store write on every mousemove during drag
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.electronAPI?.writePostIts?.(postIts);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [postIts]);
 
   useEffect(() => {
     setPositions((prev) => {
@@ -54,7 +71,13 @@ export default function CrazyBoard({
       const rect = boardRef.current?.getBoundingClientRect();
       const scrollLeft = boardRef.current?.scrollLeft ?? 0;
       const scrollTop = boardRef.current?.scrollTop ?? 0;
-      const pos = positions[id];
+      const pos =
+        type === "postit"
+          ? (() => {
+              const n = postIts.find((p) => p.id === id);
+              return n ? { x: n.x, y: n.y } : { x: 0, y: 0 };
+            })()
+          : positions[id];
       setDragging({
         id,
         type,
@@ -70,7 +93,7 @@ export default function CrazyBoard({
           (pos?.y ?? 0),
       });
     },
-    [positions]
+    [positions, postIts]
   );
 
   const handleMouseMove = useCallback(
@@ -156,8 +179,15 @@ export default function CrazyBoard({
   }, []);
 
   const handleAddPostIt = useCallback(() => {
-    const text = window.prompt("Write a clue for the post-it:");
-    if (!text) return;
+    setPostItInput("");
+  }, []);
+
+  const handleSubmitPostIt = useCallback(() => {
+    const text = postItInput?.trim();
+    if (!text) {
+      setPostItInput(null);
+      return;
+    }
     const colors = ["yellow", "pink", "green", "blue"];
     setPostIts((prev) => [
       ...prev,
@@ -170,7 +200,8 @@ export default function CrazyBoard({
         rotate: (Math.random() - 0.5) * 8,
       },
     ]);
-  }, []);
+    setPostItInput(null);
+  }, [postItInput]);
 
   const handleRemovePostIt = useCallback((id) => {
     setPostIts((prev) => prev.filter((n) => n.id !== id));
@@ -262,31 +293,106 @@ export default function CrazyBoard({
               </div>
             </button>
           )}
-          <button
-            type="button"
-            style={{
-              paddingLeft: 12,
-              paddingRight: 12,
-              paddingTop: 6,
-              paddingBottom: 6,
-              backgroundColor: "#fef08a",
-              borderRadius: 4,
-              border: "none",
-              cursor: "pointer",
-            }}
-            onClick={handleAddPostIt}
-          >
-            <div
+          {postItInput !== null ? (
+            <>
+              <input
+                autoFocus
+                style={{
+                  padding: "4px 8px",
+                  backgroundColor: "#020617",
+                  borderRadius: 4,
+                  border: "1px solid #fef08a",
+                  color: "#fef08a",
+                  fontFamily: "monospace",
+                  fontSize: 11,
+                  width: 200,
+                  outline: "none",
+                }}
+                value={postItInput}
+                onChange={(e) => setPostItInput(e.target.value)}
+                placeholder="Write a clue..."
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSubmitPostIt();
+                  if (e.key === "Escape") setPostItInput(null);
+                }}
+              />
+              <button
+                type="button"
+                style={{
+                  paddingLeft: 10,
+                  paddingRight: 10,
+                  paddingTop: 6,
+                  paddingBottom: 6,
+                  backgroundColor: "#fef08a",
+                  borderRadius: 4,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+                onClick={handleSubmitPostIt}
+              >
+                <div
+                  style={{
+                    color: "#713f12",
+                    fontSize: 10,
+                    fontFamily: "monospace",
+                    fontWeight: "bold",
+                  }}
+                >
+                  ADD
+                </div>
+              </button>
+              <button
+                type="button"
+                style={{
+                  paddingLeft: 8,
+                  paddingRight: 8,
+                  paddingTop: 6,
+                  paddingBottom: 6,
+                  backgroundColor: "transparent",
+                  borderRadius: 4,
+                  border: "1px solid #334155",
+                  cursor: "pointer",
+                }}
+                onClick={() => setPostItInput(null)}
+              >
+                <div
+                  style={{
+                    color: "#64748b",
+                    fontSize: 10,
+                    fontFamily: "monospace",
+                  }}
+                >
+                  ESC
+                </div>
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
               style={{
-                color: "#713f12",
-                fontSize: 10,
-                fontFamily: "monospace",
-                fontWeight: "bold",
+                paddingLeft: 12,
+                paddingRight: 12,
+                paddingTop: 6,
+                paddingBottom: 6,
+                backgroundColor: "#fef08a",
+                borderRadius: 4,
+                border: "none",
+                cursor: "pointer",
               }}
+              onClick={handleAddPostIt}
             >
-              + STICKY
-            </div>
-          </button>
+              <div
+                style={{
+                  color: "#713f12",
+                  fontSize: 10,
+                  fontFamily: "monospace",
+                  fontWeight: "bold",
+                }}
+              >
+                + STICKY
+              </div>
+            </button>
+          )}
         </div>
       </div>
 

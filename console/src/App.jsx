@@ -14,12 +14,31 @@ export default function App() {
   const [apiKey, setApiKey] = useState("");
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [boardPositions, setBoardPositions] = useState({});
+  const [boardManualEdges, setBoardManualEdges] = useState([]);
 
   useEffect(() => {
     loadVault();
     window.electronAPI.onVaultChanged(() => loadVault());
     return () => window.electronAPI.removeListeners("vault:changed");
   }, []);
+
+  useEffect(() => {
+    window.electronAPI?.readBoard?.().then((saved) => {
+      if (saved?.positions) setBoardPositions(saved.positions);
+      if (saved?.manualEdges) setBoardManualEdges(saved.manualEdges);
+    });
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.electronAPI?.writeBoard?.({
+        positions: boardPositions,
+        manualEdges: boardManualEdges,
+      });
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [boardPositions, boardManualEdges]);
 
   const loadVault = useCallback(async () => {
     const result = await window.electronAPI.readVault();
@@ -44,7 +63,6 @@ export default function App() {
 
   const handleSelectFile = useCallback((fileName) => {
     setActiveFile(fileName);
-    setActiveTab("editor");
   }, []);
 
   const handleOpenEditor = useCallback((fileName) => {
@@ -469,7 +487,7 @@ export default function App() {
                       cursor: "pointer",
                       width: "100%",
                     }}
-                    onClick={() => handleSelectFile(node.fileName)}
+                    onClick={() => handleOpenEditor(node.fileName)}
                   >
                     <div
                       style={{
@@ -514,6 +532,10 @@ export default function App() {
               onOpenEditor={handleOpenEditor}
               onWriteFile={handleWriteFile}
               apiKey={apiKey}
+              positions={boardPositions}
+              setPositions={setBoardPositions}
+              manualEdges={boardManualEdges}
+              setManualEdges={setBoardManualEdges}
             />
           )}
           {activeTab === "editor" && (
