@@ -2,7 +2,7 @@
   "name": "the-question-console",
   "version": "0.1.0",
   "description": "The Question Console - desktop investigation board for The Question Claude plugin",
-  "main": "electron.cjs",
+  "main": "dist-electron/electron.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,11 +12,9 @@
   "dependencies": {
     "@anthropic-ai/sdk": "~0.111.0",
     "electron-store": "^10.0.0",
-    "gray-matter": "^4.0.3",
     "lucide-react": "^1.24.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-native-web": "^0.19.13"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
