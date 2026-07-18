@@ -12,7 +12,7 @@ let mainWindow = null;
 let vaultWatcher = null;
 
 // ---------------------------------------------------------------------------
-// Vault parse logic (inline -- vaultParser.js does not exist yet)
+// Vault parse logic (inline; kept in main process for Node.js fs access)
 // ---------------------------------------------------------------------------
 
 function parseFrontmatter(content) {
@@ -91,7 +91,7 @@ function createWindow() {
     width: 1280,
     height: 800,
     webPreferences: {
-      preload: path.join(__dirname, "preload.cjs"),
+      preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },

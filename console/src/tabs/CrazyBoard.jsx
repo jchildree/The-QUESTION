@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
 import Card from "../components/Card";
 import YarnCanvas from "../components/YarnCanvas";
 import PostIt from "../components/PostIt";
@@ -8,31 +7,21 @@ const BOARD_WIDTH = 2200;
 const BOARD_HEIGHT = 1200;
 
 export default function CrazyBoard({
-  nodes, // VaultNode[] from vault:read IPC
-  edges, // Edge[] from vault:read IPC (auto-derived from wikilinks)
-  activeFile, // string: currently selected filename
-  onSelectFile, // (fileName) => void
-  onOpenEditor, // (fileName) => void
-  onWriteFile, // (fileName, content) => Promise<void>: write wikilink to vault
-  apiKey, // string: for Vic Sage terminal (passed through, not used here)
+  nodes,
+  edges,
+  activeFile,
+  onSelectFile,
+  onOpenEditor,
+  onWriteFile,
+  apiKey,
 }) {
-  // Positions: { [fileName]: { x, y, rotate } }
   const [positions, setPositions] = useState({});
-
-  // Manual yarn edges (stored separately from auto-derived wikilink edges)
   const [manualEdges, setManualEdges] = useState([]);
-
-  // Post-it notes
   const [postIts, setPostIts] = useState([]);
-
-  // Drag state
-  const [dragging, setDragging] = useState(null); // { id, type, offsetX, offsetY }
+  const [dragging, setDragging] = useState(null);
   const boardRef = useRef(null);
+  const [linkingSource, setLinkingSource] = useState(null);
 
-  // Linking mode
-  const [linkingSource, setLinkingSource] = useState(null); // fileName
-
-  // Initialize positions for new nodes (nodes that have no position yet)
   useEffect(() => {
     setPositions((prev) => {
       const updated = { ...prev };
@@ -51,7 +40,6 @@ export default function CrazyBoard({
     });
   }, [nodes]);
 
-  // Merge auto-derived edges with manual edges for rendering
   const allEdges = [
     ...edges.map((e) => ({
       ...e,
@@ -61,7 +49,6 @@ export default function CrazyBoard({
     ...manualEdges,
   ];
 
-  // Drag handlers (mouse-based for desktop)
   const handleDragStart = useCallback(
     (e, id, type) => {
       const rect = boardRef.current?.getBoundingClientRect();
@@ -123,7 +110,6 @@ export default function CrazyBoard({
 
   const handleMouseUp = useCallback(() => setDragging(null), []);
 
-  // Yarn linking
   const handleStartLink = useCallback((fileName) => {
     setLinkingSource(fileName);
   }, []);
@@ -134,7 +120,6 @@ export default function CrazyBoard({
         setLinkingSource(null);
         return;
       }
-      // Check if edge already exists
       const exists = allEdges.some(
         (e) =>
           (e.from === linkingSource && e.to === targetFileName) ||
@@ -154,7 +139,6 @@ export default function CrazyBoard({
       };
       setManualEdges((prev) => [...prev, newEdge]);
 
-      // Write wikilink to source file
       const sourceNode = nodes.find((n) => n.fileName === linkingSource);
       if (sourceNode && onWriteFile) {
         const updatedContent =
@@ -171,7 +155,6 @@ export default function CrazyBoard({
     setManualEdges((prev) => prev.filter((e) => e.id !== edgeId));
   }, []);
 
-  // Post-it operations
   const handleAddPostIt = useCallback(() => {
     const text = window.prompt("Write a clue for the post-it:");
     if (!text) return;
@@ -193,28 +176,45 @@ export default function CrazyBoard({
     setPostIts((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  // Stats
   const caseCount = nodes.filter((n) => n.type === "Case").length;
   const suspectCount = nodes.filter((n) => n.type === "Suspect").length;
   const sourceCount = nodes.filter((n) => n.type === "Source").length;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#020617" }}>
+    <div
+      style={{
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+        overflow: "hidden",
+        minHeight: 0,
+        backgroundColor: "#020617",
+      }}
+    >
       {/* Board toolbar */}
-      <View
+      <div
         style={{
+          display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingHorizontal: 16,
-          paddingVertical: 10,
+          paddingLeft: 16,
+          paddingRight: 16,
+          paddingTop: 10,
+          paddingBottom: 10,
           backgroundColor: "#0f172a",
-          borderBottomWidth: 1,
-          borderBottomColor: "#1e293b",
+          borderBottom: "1px solid #1e293b",
         }}
       >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <View
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <div
             style={{
               width: 10,
               height: 10,
@@ -222,7 +222,7 @@ export default function CrazyBoard({
               backgroundColor: "#f43f5e",
             }}
           />
-          <Text
+          <div
             style={{
               color: "#e2e8f0",
               fontFamily: "monospace",
@@ -232,22 +232,25 @@ export default function CrazyBoard({
             }}
           >
             CRAZY WALL
-          </Text>
-        </View>
-        <View style={{ flexDirection: "row", gap: 8 }}>
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
           {linkingSource && (
-            <TouchableOpacity
+            <button
+              type="button"
               style={{
-                paddingHorizontal: 12,
-                paddingVertical: 6,
+                paddingLeft: 12,
+                paddingRight: 12,
+                paddingTop: 6,
+                paddingBottom: 6,
                 backgroundColor: "#4c0519",
                 borderRadius: 4,
-                borderWidth: 1,
-                borderColor: "#f43f5e",
+                border: "1px solid #f43f5e",
+                cursor: "pointer",
               }}
-              onPress={() => setLinkingSource(null)}
+              onClick={() => setLinkingSource(null)}
             >
-              <Text
+              <div
                 style={{
                   color: "#f43f5e",
                   fontSize: 10,
@@ -256,19 +259,24 @@ export default function CrazyBoard({
                 }}
               >
                 CANCEL LINK
-              </Text>
-            </TouchableOpacity>
+              </div>
+            </button>
           )}
-          <TouchableOpacity
+          <button
+            type="button"
             style={{
-              paddingHorizontal: 12,
-              paddingVertical: 6,
+              paddingLeft: 12,
+              paddingRight: 12,
+              paddingTop: 6,
+              paddingBottom: 6,
               backgroundColor: "#fef08a",
               borderRadius: 4,
+              border: "none",
+              cursor: "pointer",
             }}
-            onPress={handleAddPostIt}
+            onClick={handleAddPostIt}
           >
-            <Text
+            <div
               style={{
                 color: "#713f12",
                 fontSize: 10,
@@ -277,20 +285,25 @@ export default function CrazyBoard({
               }}
             >
               + STICKY
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            </div>
+          </button>
+        </div>
+      </div>
 
       {/* Scrollable corkboard */}
-      <View
+      <div
         ref={boardRef}
-        style={{ flex: 1, overflow: "auto", position: "relative" }}
+        style={{
+          flex: 1,
+          overflow: "auto",
+          position: "relative",
+          minHeight: 0,
+        }}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        <View
+        <div
           style={{
             width: BOARD_WIDTH,
             height: BOARD_HEIGHT,
@@ -300,7 +313,6 @@ export default function CrazyBoard({
             backgroundSize: "24px 24px",
           }}
         >
-          {/* Yarn strings (SVG overlay, z-index 0) */}
           <YarnCanvas
             edges={allEdges}
             positions={positions}
@@ -309,7 +321,6 @@ export default function CrazyBoard({
             boardHeight={BOARD_HEIGHT}
           />
 
-          {/* Cards */}
           {nodes.map((node) => {
             const pos = positions[node.fileName] ?? {
               x: 100,
@@ -335,7 +346,6 @@ export default function CrazyBoard({
             );
           })}
 
-          {/* Post-its */}
           {postIts.map((note) => (
             <PostIt
               key={note.id}
@@ -344,19 +354,21 @@ export default function CrazyBoard({
               onRemove={() => handleRemovePostIt(note.id)}
             />
           ))}
-        </View>
-      </View>
+        </div>
+      </div>
 
       {/* Stats bar */}
-      <View
+      <div
         style={{
+          display: "flex",
           flexDirection: "row",
-          paddingVertical: 10,
-          paddingHorizontal: 16,
+          paddingTop: 10,
+          paddingBottom: 10,
+          paddingLeft: 16,
+          paddingRight: 16,
           gap: 12,
           backgroundColor: "#020617",
-          borderTopWidth: 1,
-          borderTopColor: "#0f172a",
+          borderTop: "1px solid #0f172a",
         }}
       >
         {[
@@ -386,19 +398,20 @@ export default function CrazyBoard({
             bg: "#1c1a08",
           },
         ].map(({ count, label, color, bg }) => (
-          <View
+          <div
             key={label}
             style={{
+              display: "flex",
+              flexDirection: "column",
               flex: 1,
               padding: 8,
               backgroundColor: bg,
               borderRadius: 4,
               alignItems: "center",
-              borderWidth: 1,
-              borderColor: `${color}20`,
+              border: `1px solid ${color}20`,
             }}
           >
-            <Text
+            <div
               style={{
                 color,
                 fontFamily: "monospace",
@@ -407,8 +420,8 @@ export default function CrazyBoard({
               }}
             >
               {count}
-            </Text>
-            <Text
+            </div>
+            <div
               style={{
                 color: "#475569",
                 fontFamily: "monospace",
@@ -417,10 +430,10 @@ export default function CrazyBoard({
               }}
             >
               {label}
-            </Text>
-          </View>
+            </div>
+          </div>
         ))}
-      </View>
-    </View>
+      </div>
+    </div>
   );
 }

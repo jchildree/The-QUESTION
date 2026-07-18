@@ -1,11 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-} from "react-native";
 import { parseMarkdownLines, getConfidenceColor } from "../lib/vaultParser";
 
 export default function MarkdownEditor({ node, onSelectFile, onWriteFile }) {
@@ -27,20 +20,23 @@ export default function MarkdownEditor({ node, onSelectFile, onWriteFile }) {
 
   if (!node) {
     return (
-      <View
+      <div
         style={{
+          display: "flex",
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
           backgroundColor: "#020617",
+          overflow: "hidden",
+          minHeight: 0,
         }}
       >
-        <Text
+        <div
           style={{ color: "#475569", fontFamily: "monospace", fontSize: 12 }}
         >
           Select a card to view its file.
-        </Text>
-      </View>
+        </div>
+      </div>
     );
   }
 
@@ -48,56 +44,86 @@ export default function MarkdownEditor({ node, onSelectFile, onWriteFile }) {
   const lines = parseMarkdownLines(node.content);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#020617" }}>
+    <div
+      style={{
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+        backgroundColor: "#020617",
+        overflow: "hidden",
+        minHeight: 0,
+      }}
+    >
       {/* Header */}
-      <View
+      <div
         style={{
+          display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingHorizontal: 16,
-          paddingVertical: 10,
+          paddingLeft: 16,
+          paddingRight: 16,
+          paddingTop: 10,
+          paddingBottom: 10,
           backgroundColor: "#0f172a",
-          borderBottomWidth: 1,
-          borderBottomColor: "#1e293b",
+          borderBottom: "1px solid #1e293b",
         }}
       >
-        <View
+        <div
           style={{
+            display: "flex",
             flexDirection: "row",
             alignItems: "center",
             gap: 8,
             flex: 1,
+            overflow: "hidden",
           }}
         >
-          <View
+          <div
             style={{
               width: 4,
               height: 16,
               backgroundColor: confidenceColor,
               borderRadius: 2,
+              flexShrink: 0,
             }}
           />
-          <Text
-            style={{ color: "#e2e8f0", fontFamily: "monospace", fontSize: 11 }}
-            numberOfLines={1}
+          <div
+            style={{
+              color: "#e2e8f0",
+              fontFamily: "monospace",
+              fontSize: 11,
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            }}
           >
             {node.fileName}
-          </Text>
-        </View>
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          <TouchableOpacity
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: 8,
+            flexShrink: 0,
+          }}
+        >
+          <button
+            type="button"
             style={{
-              paddingHorizontal: 12,
-              paddingVertical: 6,
+              paddingLeft: 12,
+              paddingRight: 12,
+              paddingTop: 6,
+              paddingBottom: 6,
               borderRadius: 4,
               backgroundColor: !editMode ? "#4c0519" : "#1e293b",
-              borderWidth: 1,
-              borderColor: !editMode ? "#f43f5e" : "#334155",
+              border: `1px solid ${!editMode ? "#f43f5e" : "#334155"}`,
+              cursor: "pointer",
             }}
-            onPress={() => setEditMode(false)}
+            onClick={() => setEditMode(false)}
           >
-            <Text
+            <div
               style={{
                 color: !editMode ? "#f43f5e" : "#94a3b8",
                 fontSize: 10,
@@ -105,20 +131,23 @@ export default function MarkdownEditor({ node, onSelectFile, onWriteFile }) {
               }}
             >
               PREVIEW
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+            </div>
+          </button>
+          <button
+            type="button"
             style={{
-              paddingHorizontal: 12,
-              paddingVertical: 6,
+              paddingLeft: 12,
+              paddingRight: 12,
+              paddingTop: 6,
+              paddingBottom: 6,
               borderRadius: 4,
               backgroundColor: editMode ? "#4c0519" : "#1e293b",
-              borderWidth: 1,
-              borderColor: editMode ? "#f43f5e" : "#334155",
+              border: `1px solid ${editMode ? "#f43f5e" : "#334155"}`,
+              cursor: "pointer",
             }}
-            onPress={() => setEditMode(true)}
+            onClick={() => setEditMode(true)}
           >
-            <Text
+            <div
               style={{
                 color: editMode ? "#f43f5e" : "#94a3b8",
                 fontSize: 10,
@@ -126,19 +155,24 @@ export default function MarkdownEditor({ node, onSelectFile, onWriteFile }) {
               }}
             >
               EDIT MD
-            </Text>
-          </TouchableOpacity>
+            </div>
+          </button>
           {editMode && (
-            <TouchableOpacity
+            <button
+              type="button"
               style={{
-                paddingHorizontal: 12,
-                paddingVertical: 6,
+                paddingLeft: 12,
+                paddingRight: 12,
+                paddingTop: 6,
+                paddingBottom: 6,
                 borderRadius: 4,
                 backgroundColor: "#14532d",
+                border: "none",
+                cursor: "pointer",
               }}
-              onPress={handleSave}
+              onClick={handleSave}
             >
-              <Text
+              <div
                 style={{
                   color: "#86efac",
                   fontSize: 10,
@@ -147,64 +181,72 @@ export default function MarkdownEditor({ node, onSelectFile, onWriteFile }) {
                 }}
               >
                 SAVE
-              </Text>
-            </TouchableOpacity>
+              </div>
+            </button>
           )}
-        </View>
-      </View>
+        </div>
+      </div>
 
       {/* Content area */}
       {editMode ? (
-        <TextInput
+        <textarea
           style={{
             flex: 1,
+            width: "100%",
+            minHeight: 0,
             padding: 20,
             color: "#e2e8f0",
             fontFamily: "monospace",
             fontSize: 13,
             lineHeight: 22,
             backgroundColor: "#020617",
-            textAlignVertical: "top",
+            border: "none",
+            outline: "none",
+            resize: "none",
+            overflow: "auto",
+            boxSizing: "border-box",
           }}
-          multiline
           value={editContent}
-          onChangeText={setEditContent}
+          onChange={(e) => setEditContent(e.target.value)}
           placeholder="# Case: Title..."
-          placeholderTextColor="#334155"
         />
       ) : (
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            padding: 32,
-            maxWidth: 720,
-            alignSelf: "center",
-            width: "100%",
-          }}
-        >
-          {lines.map((line, idx) => renderLine(line, idx, onSelectFile))}
-          <View style={{ height: 80 }} />
-        </ScrollView>
+        <div style={{ flex: 1, overflow: "auto", minHeight: 0 }}>
+          <div
+            style={{
+              padding: 32,
+              maxWidth: 720,
+              margin: "0 auto",
+              width: "100%",
+              boxSizing: "border-box",
+            }}
+          >
+            {lines.map((line, idx) => renderLine(line, idx, onSelectFile))}
+            <div style={{ height: 80 }} />
+          </div>
+        </div>
       )}
 
       {/* Footer: char count */}
-      <View
+      <div
         style={{
-          paddingHorizontal: 16,
-          paddingVertical: 8,
+          display: "flex",
+          paddingLeft: 16,
+          paddingRight: 16,
+          paddingTop: 8,
+          paddingBottom: 8,
           backgroundColor: "#0f172a",
-          borderTopWidth: 1,
-          borderTopColor: "#1e293b",
+          borderTop: "1px solid #1e293b",
           flexDirection: "row",
           justifyContent: "space-between",
         }}
       >
-        <Text
+        <div
           style={{ color: "#475569", fontFamily: "monospace", fontSize: 10 }}
         >
           {node.content.length} chars
-        </Text>
-        <Text
+        </div>
+        <div
           style={{
             color: confidenceColor,
             fontFamily: "monospace",
@@ -212,9 +254,9 @@ export default function MarkdownEditor({ node, onSelectFile, onWriteFile }) {
           }}
         >
           {(node.confidence ?? "unknown").toUpperCase()}
-        </Text>
-      </View>
-    </View>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -222,12 +264,12 @@ function renderLine(line, idx, onSelectFile) {
   const key = `line-${idx}`;
 
   if (line.type === "frontmatter" || line.type === "empty") {
-    return <View key={key} style={{ height: 8 }} />;
+    return <div key={key} style={{ height: 8 }} />;
   }
 
   if (line.type === "h1") {
     return (
-      <Text
+      <div
         key={key}
         style={{
           color: "#f43f5e",
@@ -236,18 +278,17 @@ function renderLine(line, idx, onSelectFile) {
           fontWeight: "bold",
           marginBottom: 16,
           paddingBottom: 8,
-          borderBottomWidth: 1,
-          borderBottomColor: "#1e293b",
+          borderBottom: "1px solid #1e293b",
         }}
       >
         {line.text}
-      </Text>
+      </div>
     );
   }
 
   if (line.type === "h2") {
     return (
-      <Text
+      <div
         key={key}
         style={{
           color: "#e2e8f0",
@@ -257,18 +298,17 @@ function renderLine(line, idx, onSelectFile) {
           marginTop: 24,
           marginBottom: 8,
           paddingBottom: 4,
-          borderBottomWidth: 1,
-          borderBottomColor: "#0f172a",
+          borderBottom: "1px solid #0f172a",
         }}
       >
         {line.text}
-      </Text>
+      </div>
     );
   }
 
   if (line.type === "h3") {
     return (
-      <Text
+      <div
         key={key}
         style={{
           color: "#cbd5e1",
@@ -280,45 +320,49 @@ function renderLine(line, idx, onSelectFile) {
         }}
       >
         {line.text}
-      </Text>
+      </div>
     );
   }
 
   if (line.type === "status") {
     const isOpen = line.value?.trim() === "Open";
     return (
-      <View
+      <div
         key={key}
         style={{
+          display: "flex",
           flexDirection: "row",
           alignItems: "center",
           gap: 8,
-          marginVertical: 8,
+          marginTop: 8,
+          marginBottom: 8,
           padding: 8,
           backgroundColor: "#0f172a",
           borderRadius: 4,
         }}
       >
-        <Text
+        <div
           style={{ color: "#64748b", fontFamily: "monospace", fontSize: 10 }}
         >
           STATUS
-        </Text>
-        <Text
+        </div>
+        <div
           style={{
             color: isOpen ? "#f43f5e" : "#64748b",
             fontFamily: "monospace",
             fontSize: 11,
             fontWeight: "bold",
-            paddingHorizontal: 8,
-            paddingVertical: 3,
+            paddingLeft: 8,
+            paddingRight: 8,
+            paddingTop: 3,
+            paddingBottom: 3,
             borderRadius: 3,
             backgroundColor: isOpen ? "#4c0519" : "#1e293b",
           }}
         >
           {(line.value ?? "").trim().toUpperCase()}
-        </Text>
-      </View>
+        </div>
+      </div>
     );
   }
 
@@ -333,46 +377,51 @@ function renderLine(line, idx, onSelectFile) {
       text: "#94a3b8",
     };
     return (
-      <View
+      <div
         key={key}
         style={{
+          display: "flex",
           flexDirection: "row",
           alignItems: "center",
           gap: 8,
-          marginVertical: 8,
+          marginTop: 8,
+          marginBottom: 8,
           padding: 8,
           backgroundColor: "#0f172a",
           borderRadius: 4,
         }}
       >
-        <Text
+        <div
           style={{ color: "#64748b", fontFamily: "monospace", fontSize: 10 }}
         >
           VERDICT
-        </Text>
-        <Text
+        </div>
+        <div
           style={{
             color: vc.text,
             fontFamily: "monospace",
             fontSize: 11,
             fontWeight: "bold",
-            paddingHorizontal: 8,
-            paddingVertical: 3,
+            paddingLeft: 8,
+            paddingRight: 8,
+            paddingTop: 3,
+            paddingBottom: 3,
             borderRadius: 3,
             backgroundColor: vc.bg,
           }}
         >
           {(line.value ?? "").trim().toUpperCase()}
-        </Text>
-      </View>
+        </div>
+      </div>
     );
   }
 
   if (line.type === "list" || line.type === "paragraph") {
     return (
-      <View
+      <div
         key={key}
         style={{
+          display: "flex",
           flexDirection: "row",
           flexWrap: "wrap",
           marginBottom: 6,
@@ -381,35 +430,38 @@ function renderLine(line, idx, onSelectFile) {
         }}
       >
         {line.type === "list" && (
-          <Text
+          <span
             style={{ color: "#64748b", fontFamily: "monospace", fontSize: 13 }}
           >
             -{" "}
-          </Text>
+          </span>
         )}
         {renderInlineText(line.text, line.links ?? [], onSelectFile)}
-      </View>
+      </div>
     );
   }
 
   if (line.type === "code") {
     return (
-      <View
+      <div
         key={key}
         style={{
           backgroundColor: "#0f172a",
           borderRadius: 4,
-          paddingHorizontal: 12,
-          paddingVertical: 8,
-          marginVertical: 4,
+          paddingLeft: 12,
+          paddingRight: 12,
+          paddingTop: 8,
+          paddingBottom: 8,
+          marginTop: 4,
+          marginBottom: 4,
         }}
       >
-        <Text
+        <div
           style={{ color: "#67e8f9", fontFamily: "monospace", fontSize: 12 }}
         >
           {line.text}
-        </Text>
-      </View>
+        </div>
+      </div>
     );
   }
 
@@ -419,7 +471,7 @@ function renderLine(line, idx, onSelectFile) {
 function renderInlineText(text, links, onSelectFile) {
   if (!links || links.length === 0) {
     return (
-      <Text
+      <span
         style={{
           color: "#cbd5e1",
           fontFamily: "monospace",
@@ -428,7 +480,7 @@ function renderInlineText(text, links, onSelectFile) {
         }}
       >
         {text}
-      </Text>
+      </span>
     );
   }
 
@@ -441,7 +493,7 @@ function renderInlineText(text, links, onSelectFile) {
     if (splitAt === -1) continue;
     if (splitAt > 0) {
       parts.push(
-        <Text
+        <span
           key={`t-${partIdx++}`}
           style={{
             color: "#cbd5e1",
@@ -451,38 +503,36 @@ function renderInlineText(text, links, onSelectFile) {
           }}
         >
           {remaining.slice(0, splitAt)}
-        </Text>
+        </span>
       );
     }
     parts.push(
-      <TouchableOpacity
+      <span
         key={`l-${partIdx++}`}
-        onPress={() => {
+        style={{
+          color: "#f43f5e",
+          fontFamily: "monospace",
+          fontSize: 13,
+          lineHeight: 22,
+          fontWeight: "bold",
+          cursor: "pointer",
+        }}
+        onClick={() => {
           const targetWithMd = link.target.endsWith(".md")
             ? link.target
             : `${link.target}.md`;
           onSelectFile?.(targetWithMd);
         }}
       >
-        <Text
-          style={{
-            color: "#f43f5e",
-            fontFamily: "monospace",
-            fontSize: 13,
-            lineHeight: 22,
-            fontWeight: "bold",
-          }}
-        >
-          [[{link.target}]]
-        </Text>
-      </TouchableOpacity>
+        [[{link.target}]]
+      </span>
     );
     remaining = remaining.slice(splitAt + link.text.length);
   }
 
   if (remaining) {
     parts.push(
-      <Text
+      <span
         key={`t-${partIdx++}`}
         style={{
           color: "#cbd5e1",
@@ -492,7 +542,7 @@ function renderInlineText(text, links, onSelectFile) {
         }}
       >
         {remaining}
-      </Text>
+      </span>
     );
   }
 

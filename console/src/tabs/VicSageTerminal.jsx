@@ -1,11 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
 import { queryClaude } from "../lib/claudeClient";
 
 const INITIAL_MESSAGE = {
@@ -15,10 +8,10 @@ const INITIAL_MESSAGE = {
 };
 
 export default function VicSageTerminal({
-  nodes, // VaultNode[]
-  apiKey, // string: Claude API key (user sets in Settings)
-  onWriteFile, // (fileName, content) => Promise<void>
-  onVaultRefresh, // () => void: called after writing new files to trigger vault re-read
+  nodes,
+  apiKey,
+  onWriteFile,
+  onVaultRefresh,
 }) {
   const [history, setHistory] = useState([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
@@ -27,12 +20,12 @@ export default function VicSageTerminal({
   const scrollRef = useRef(null);
   const cleanupRef = useRef(null);
 
-  // Auto-scroll on new messages
   useEffect(() => {
-    scrollRef.current?.scrollToEnd({ animated: true });
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
   }, [history, streamBuffer]);
 
-  // Cleanup listeners on unmount
   useEffect(() => {
     return () => cleanupRef.current?.();
   }, []);
@@ -53,7 +46,7 @@ export default function VicSageTerminal({
 
     const messages = [
       ...history
-        .filter((m) => m.sender !== "vic" || history.indexOf(m) > 0) // skip initial greeting
+        .filter((m) => m.sender !== "vic" || history.indexOf(m) > 0)
         .map((m) => ({
           role: m.sender === "user" ? "user" : "assistant",
           content: m.text,
@@ -72,7 +65,6 @@ export default function VicSageTerminal({
         setStreaming(false);
         setStreamBuffer("");
 
-        // Parse JSON response from Claude
         let investigatorText = fullText;
         let newFiles = [];
 
@@ -81,10 +73,9 @@ export default function VicSageTerminal({
           investigatorText = parsed.investigatorText ?? fullText;
           newFiles = parsed.newFiles ?? [];
         } catch {
-          // Not JSON -- treat as plain text response
+          // ponytail: plain text response, not JSON
         }
 
-        // Add Vic Sage message to history
         setHistory((prev) => [
           ...prev,
           {
@@ -94,14 +85,12 @@ export default function VicSageTerminal({
           },
         ]);
 
-        // Write any new files to vault
         for (const file of newFiles) {
           if (file.name && file.content) {
             await onWriteFile?.(file.name, file.content);
           }
         }
 
-        // Trigger vault refresh if new files were written
         if (newFiles.length > 0) {
           onVaultRefresh?.();
         }
@@ -125,22 +114,40 @@ export default function VicSageTerminal({
   }, [input, streaming, history, nodes, apiKey, onWriteFile, onVaultRefresh]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#020617" }}>
+    <div
+      style={{
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+        overflow: "hidden",
+        minHeight: 0,
+        backgroundColor: "#020617",
+      }}
+    >
       {/* Terminal banner */}
-      <View
+      <div
         style={{
+          display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingHorizontal: 16,
-          paddingVertical: 10,
+          paddingLeft: 16,
+          paddingRight: 16,
+          paddingTop: 10,
+          paddingBottom: 10,
           backgroundColor: "#0f172a",
-          borderBottomWidth: 1,
-          borderBottomColor: "#1e293b",
+          borderBottom: "1px solid #1e293b",
         }}
       >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <View
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <div
             style={{
               width: 10,
               height: 10,
@@ -148,7 +155,7 @@ export default function VicSageTerminal({
               backgroundColor: streaming ? "#f43f5e" : "#22c55e",
             }}
           />
-          <Text
+          <div
             style={{
               color: "#f43f5e",
               fontFamily: "monospace",
@@ -158,167 +165,176 @@ export default function VicSageTerminal({
             }}
           >
             THE QUESTION [CLI]
-          </Text>
-        </View>
-        <Text
-          style={{ color: "#475569", fontFamily: "monospace", fontSize: 9 }}
-        >
+          </div>
+        </div>
+        <div style={{ color: "#475569", fontFamily: "monospace", fontSize: 9 }}>
           {streaming ? "SCANNING..." : "READY"}
-        </Text>
-      </View>
+        </div>
+      </div>
 
       {/* Message history */}
-      <ScrollView
-        ref={scrollRef}
-        style={{ flex: 1 }}
-        contentContainerStyle={{ padding: 16, gap: 12 }}
-      >
-        {history.map((msg, idx) => (
-          <View
-            key={idx}
-            style={{
-              padding: 14,
-              borderRadius: 6,
-              backgroundColor:
-                msg.sender === "vic"
-                  ? "#0f172a"
-                  : msg.sender === "error"
-                    ? "#1c0a0d"
-                    : "#020617",
-              borderWidth: 1,
-              borderColor:
-                msg.sender === "vic"
-                  ? "#1e293b"
-                  : msg.sender === "error"
-                    ? "#f43f5e"
-                    : "#0f172a",
-            }}
-          >
-            <View
+      <div ref={scrollRef} style={{ flex: 1, overflow: "auto", minHeight: 0 }}>
+        <div
+          style={{
+            padding: 16,
+            gap: 12,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {history.map((msg, idx) => (
+            <div
+              key={idx}
               style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 6,
+                padding: 14,
+                borderRadius: 6,
+                backgroundColor:
+                  msg.sender === "vic"
+                    ? "#0f172a"
+                    : msg.sender === "error"
+                      ? "#1c0a0d"
+                      : "#020617",
+                border: `1px solid ${
+                  msg.sender === "vic"
+                    ? "#1e293b"
+                    : msg.sender === "error"
+                      ? "#f43f5e"
+                      : "#0f172a"
+                }`,
               }}
             >
-              <Text
+              <div
                 style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: 6,
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "monospace",
+                    fontSize: 9,
+                    fontWeight: "bold",
+                    color:
+                      msg.sender === "vic"
+                        ? "#f43f5e"
+                        : msg.sender === "error"
+                          ? "#f43f5e"
+                          : "#94a3b8",
+                  }}
+                >
+                  {msg.sender === "vic"
+                    ? "THE QUESTION (VIC SAGE)"
+                    : msg.sender === "error"
+                      ? "ERROR"
+                      : "YOU"}
+                </div>
+                <div
+                  style={{
+                    color: "#475569",
+                    fontFamily: "monospace",
+                    fontSize: 9,
+                  }}
+                >
+                  {msg.time}
+                </div>
+              </div>
+              <div
+                style={{
+                  color: "#cbd5e1",
+                  fontFamily: "monospace",
+                  fontSize: 13,
+                  lineHeight: 22,
+                }}
+              >
+                {msg.text}
+              </div>
+            </div>
+          ))}
+
+          {streaming && (
+            <div
+              style={{
+                padding: 14,
+                borderRadius: 6,
+                backgroundColor: "#0f172a",
+                border: "1px solid #f43f5e40",
+              }}
+            >
+              <div
+                style={{
+                  color: "#f43f5e",
                   fontFamily: "monospace",
                   fontSize: 9,
                   fontWeight: "bold",
-                  color:
-                    msg.sender === "vic"
-                      ? "#f43f5e"
-                      : msg.sender === "error"
-                        ? "#f43f5e"
-                        : "#94a3b8",
+                  marginBottom: 6,
                 }}
               >
-                {msg.sender === "vic"
-                  ? "THE QUESTION (VIC SAGE)"
-                  : msg.sender === "error"
-                    ? "ERROR"
-                    : "YOU"}
-              </Text>
-              <Text
+                THE QUESTION (VIC SAGE)
+              </div>
+              <div
                 style={{
-                  color: "#475569",
+                  color: "#cbd5e1",
                   fontFamily: "monospace",
-                  fontSize: 9,
+                  fontSize: 13,
+                  lineHeight: 22,
                 }}
               >
-                {msg.time}
-              </Text>
-            </View>
-            <Text
-              style={{
-                color: "#cbd5e1",
-                fontFamily: "monospace",
-                fontSize: 13,
-                lineHeight: 22,
-              }}
-            >
-              {msg.text}
-            </Text>
-          </View>
-        ))}
+                {streamBuffer || "..."}
+              </div>
+            </div>
+          )}
 
-        {/* Streaming indicator */}
-        {streaming && (
-          <View
-            style={{
-              padding: 14,
-              borderRadius: 6,
-              backgroundColor: "#0f172a",
-              borderWidth: 1,
-              borderColor: "#f43f5e40",
-            }}
-          >
-            <Text
-              style={{
-                color: "#f43f5e",
-                fontFamily: "monospace",
-                fontSize: 9,
-                fontWeight: "bold",
-                marginBottom: 6,
-              }}
-            >
-              THE QUESTION (VIC SAGE)
-            </Text>
-            <Text
-              style={{
-                color: "#cbd5e1",
-                fontFamily: "monospace",
-                fontSize: 13,
-                lineHeight: 22,
-              }}
-            >
-              {streamBuffer || "..."}
-            </Text>
-          </View>
-        )}
-
-        <View style={{ height: 20 }} />
-      </ScrollView>
+          <div style={{ height: 20 }} />
+        </div>
+      </div>
 
       {/* Quick actions */}
-      <View
+      <div
         style={{
-          paddingHorizontal: 12,
-          paddingVertical: 8,
+          display: "flex",
+          paddingLeft: 12,
+          paddingRight: 12,
+          paddingTop: 8,
+          paddingBottom: 8,
           flexDirection: "row",
           gap: 8,
           flexWrap: "wrap",
           backgroundColor: "#0f172a",
-          borderTopWidth: 1,
-          borderTopColor: "#1e293b",
+          borderTop: "1px solid #1e293b",
+          alignItems: "center",
         }}
       >
-        <Text
+        <div
           style={{
             color: "#475569",
             fontFamily: "monospace",
             fontSize: 10,
-            alignSelf: "center",
           }}
         >
           Quick:
-        </Text>
+        </div>
         {[
           "/investigate memory leak in API pool",
           "/interrogate-spec auth token caching",
         ].map((cmd) => (
-          <TouchableOpacity
+          <button
             key={cmd}
+            type="button"
             style={{
-              paddingHorizontal: 10,
-              paddingVertical: 5,
+              paddingLeft: 10,
+              paddingRight: 10,
+              paddingTop: 5,
+              paddingBottom: 5,
               backgroundColor: "#1e293b",
               borderRadius: 4,
+              border: "none",
+              cursor: "pointer",
             }}
-            onPress={() => setInput(cmd)}
+            onClick={() => setInput(cmd)}
           >
-            <Text
+            <div
               style={{
                 color: "#94a3b8",
                 fontFamily: "monospace",
@@ -326,53 +342,59 @@ export default function VicSageTerminal({
               }}
             >
               {cmd}
-            </Text>
-          </TouchableOpacity>
+            </div>
+          </button>
         ))}
-      </View>
+      </div>
 
       {/* Input area */}
-      <View
+      <div
         style={{
+          display: "flex",
           flexDirection: "row",
           gap: 8,
           padding: 12,
+          flexShrink: 0,
           backgroundColor: "#020617",
-          borderTopWidth: 1,
-          borderTopColor: "#0f172a",
+          borderTop: "1px solid #0f172a",
         }}
       >
-        <TextInput
+        <input
           style={{
             flex: 1,
             padding: 12,
             backgroundColor: "#0f172a",
-            borderWidth: 1,
-            borderColor: "#1e293b",
+            border: "1px solid #1e293b",
             borderRadius: 6,
             color: "#e2e8f0",
             fontFamily: "monospace",
             fontSize: 13,
+            outline: "none",
           }}
           value={input}
-          onChangeText={setInput}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Type command or question..."
-          placeholderTextColor="#334155"
-          onSubmitEditing={handleSend}
-          editable={!streaming}
-          returnKeyType="send"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !streaming) handleSend();
+          }}
+          disabled={streaming}
         />
-        <TouchableOpacity
+        <button
+          type="button"
           style={{
-            paddingHorizontal: 16,
-            paddingVertical: 12,
+            paddingLeft: 16,
+            paddingRight: 16,
+            paddingTop: 12,
+            paddingBottom: 12,
             borderRadius: 6,
             backgroundColor: streaming ? "#1e293b" : "#9f1239",
+            border: "none",
+            cursor: streaming ? "default" : "pointer",
           }}
-          onPress={handleSend}
+          onClick={handleSend}
           disabled={streaming}
         >
-          <Text
+          <div
             style={{
               color: streaming ? "#475569" : "#fda4af",
               fontFamily: "monospace",
@@ -381,9 +403,9 @@ export default function VicSageTerminal({
             }}
           >
             {streaming ? "WAIT" : "SEND"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          </div>
+        </button>
+      </div>
+    </div>
   );
 }

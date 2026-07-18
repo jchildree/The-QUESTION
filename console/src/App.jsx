@@ -1,11 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-} from "react-native";
 import CrazyBoard from "./tabs/CrazyBoard";
 import MarkdownEditor from "./tabs/MarkdownEditor";
 import VicSageTerminal from "./tabs/VicSageTerminal";
@@ -22,7 +15,6 @@ export default function App() {
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Load vault on mount + watch for changes
   useEffect(() => {
     loadVault();
     window.electronAPI.onVaultChanged(() => loadVault());
@@ -76,36 +68,55 @@ export default function App() {
   };
 
   return (
-    <View
-      style={{ flex: 1, flexDirection: "column", backgroundColor: "#020617" }}
+    <div
+      style={{
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+        backgroundColor: "#020617",
+        overflow: "hidden",
+      }}
     >
       {/* Header */}
-      <View
+      <div
         style={{
+          display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingHorizontal: 16,
-          paddingVertical: 12,
+          paddingLeft: 16,
+          paddingRight: 16,
+          paddingTop: 12,
+          paddingBottom: 12,
           backgroundColor: "#0f172a",
           borderBottomWidth: 1,
+          borderBottomStyle: "solid",
           borderBottomColor: "#f43f5e30",
         }}
       >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-          <View
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
+          <div
             style={{
+              display: "flex",
               width: 36,
               height: 36,
               borderRadius: 4,
               backgroundColor: "#1c0a0d",
               borderWidth: 1,
+              borderStyle: "solid",
               borderColor: "#f43f5e",
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            <Text
+            <div
               style={{
                 color: "#f43f5e",
                 fontFamily: "monospace",
@@ -114,10 +125,10 @@ export default function App() {
               }}
             >
               ?
-            </Text>
-          </View>
-          <View>
-            <Text
+            </div>
+          </div>
+          <div>
+            <div
               style={{
                 color: "#e2e8f0",
                 fontFamily: "monospace",
@@ -127,27 +138,39 @@ export default function App() {
               }}
             >
               THE QUESTION
-            </Text>
-            <Text
+            </div>
+            <div
               style={{ color: "#475569", fontFamily: "monospace", fontSize: 9 }}
             >
               {vaultPath ?? "No vault open"}
-            </Text>
-          </View>
-        </View>
-        <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
-          <TouchableOpacity
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: 8,
+            alignItems: "center",
+          }}
+        >
+          <button
+            type="button"
             style={{
-              paddingHorizontal: 12,
-              paddingVertical: 7,
+              paddingLeft: 12,
+              paddingRight: 12,
+              paddingTop: 7,
+              paddingBottom: 7,
               borderRadius: 4,
               backgroundColor: showApiKeyInput ? "#4c0519" : "#1e293b",
               borderWidth: 1,
+              borderStyle: "solid",
               borderColor: showApiKeyInput ? "#f43f5e" : "#334155",
+              cursor: "pointer",
             }}
-            onPress={() => setShowApiKeyInput((v) => !v)}
+            onClick={() => setShowApiKeyInput((v) => !v)}
           >
-            <Text
+            <div
               style={{
                 color: apiKey ? "#22c55e" : "#f59e0b",
                 fontFamily: "monospace",
@@ -156,20 +179,25 @@ export default function App() {
               }}
             >
               {apiKey ? "KEY SET" : "SET API KEY"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+            </div>
+          </button>
+          <button
+            type="button"
             style={{
-              paddingHorizontal: 12,
-              paddingVertical: 7,
+              paddingLeft: 12,
+              paddingRight: 12,
+              paddingTop: 7,
+              paddingBottom: 7,
               borderRadius: 4,
               backgroundColor: "#1e293b",
               borderWidth: 1,
+              borderStyle: "solid",
               borderColor: "#334155",
+              cursor: "pointer",
             }}
-            onPress={handleOpenVault}
+            onClick={handleOpenVault}
           >
-            <Text
+            <div
               style={{
                 color: "#94a3b8",
                 fontFamily: "monospace",
@@ -178,52 +206,61 @@ export default function App() {
               }}
             >
               OPEN VAULT
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            </div>
+          </button>
+        </div>
+      </div>
 
       {/* API key input (shown when toggled) */}
       {showApiKeyInput && (
-        <View
+        <div
           style={{
-            paddingHorizontal: 16,
-            paddingVertical: 10,
+            display: "flex",
+            paddingLeft: 16,
+            paddingRight: 16,
+            paddingTop: 10,
+            paddingBottom: 10,
             backgroundColor: "#0f172a",
             borderBottomWidth: 1,
+            borderBottomStyle: "solid",
             borderBottomColor: "#1e293b",
             flexDirection: "row",
             gap: 8,
           }}
         >
-          <TextInput
+          <input
             style={{
               flex: 1,
               padding: 10,
               backgroundColor: "#020617",
               borderRadius: 4,
               borderWidth: 1,
+              borderStyle: "solid",
               borderColor: "#334155",
               color: "#e2e8f0",
               fontFamily: "monospace",
               fontSize: 12,
             }}
             value={apiKey}
-            onChangeText={setApiKey}
+            onChange={(e) => setApiKey(e.target.value)}
             placeholder="sk-ant-..."
-            placeholderTextColor="#334155"
-            secureTextEntry
+            type="password"
           />
-          <TouchableOpacity
+          <button
+            type="button"
             style={{
-              paddingHorizontal: 12,
-              paddingVertical: 10,
+              paddingLeft: 12,
+              paddingRight: 12,
+              paddingTop: 10,
+              paddingBottom: 10,
               backgroundColor: "#052e16",
               borderRadius: 4,
+              border: "none",
+              cursor: "pointer",
             }}
-            onPress={() => setShowApiKeyInput(false)}
+            onClick={() => setShowApiKeyInput(false)}
           >
-            <Text
+            <div
               style={{
                 color: "#86efac",
                 fontFamily: "monospace",
@@ -232,67 +269,88 @@ export default function App() {
               }}
             >
               SAVE
-            </Text>
-          </TouchableOpacity>
-        </View>
+            </div>
+          </button>
+        </div>
       )}
 
       {/* Main layout: sidebar + content */}
-      <View style={{ flex: 1, flexDirection: "row" }}>
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          flexDirection: "row",
+          overflow: "hidden",
+          minHeight: 0,
+        }}
+      >
         {/* Sidebar */}
-        <View
+        <div
           style={{
+            display: "flex",
+            flexDirection: "column",
             width: 240,
             backgroundColor: "#0a0f1e",
-            borderRightWidth: 1,
-            borderRightColor: "#1e293b",
-            flexDirection: "column",
+            borderRight: "1px solid #1e293b",
+            overflow: "hidden",
+            minHeight: 0,
           }}
         >
           {/* Tab navigation */}
-          <View
+          <div
             style={{
+              display: "flex",
+              flexDirection: "column",
               padding: 12,
               borderBottomWidth: 1,
+              borderBottomStyle: "solid",
               borderBottomColor: "#1e293b",
               gap: 4,
             }}
           >
-            <Text
+            <div
               style={{
                 color: "#475569",
                 fontFamily: "monospace",
                 fontSize: 9,
                 fontWeight: "bold",
                 letterSpacing: 2,
-                paddingHorizontal: 4,
+                paddingLeft: 4,
+                paddingRight: 4,
                 paddingBottom: 6,
               }}
             >
               VIEWS
-            </Text>
+            </div>
             {[
               { id: "crazyboard", label: "Crazy Wall" },
               { id: "editor", label: "File Editor" },
               { id: "terminal", label: "Vic Sage CLI" },
             ].map((tab) => (
-              <TouchableOpacity
+              <button
                 key={tab.id}
+                type="button"
                 style={{
+                  display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  paddingHorizontal: 10,
-                  paddingVertical: 8,
+                  paddingLeft: 10,
+                  paddingRight: 10,
+                  paddingTop: 8,
+                  paddingBottom: 8,
                   borderRadius: 4,
                   backgroundColor:
                     activeTab === tab.id ? "#1c0a0d" : "transparent",
                   borderWidth: activeTab === tab.id ? 1 : 0,
+                  borderStyle: "solid",
                   borderColor: "#f43f5e30",
+                  cursor: "pointer",
+                  width: "100%",
                 }}
-                onPress={() => setActiveTab(tab.id)}
+                onClick={() => setActiveTab(tab.id)}
               >
-                <Text
+                <div
                   style={{
                     color: activeTab === tab.id ? "#f43f5e" : "#64748b",
                     fontFamily: "monospace",
@@ -301,9 +359,9 @@ export default function App() {
                   }}
                 >
                   {tab.label}
-                </Text>
+                </div>
                 {activeTab === tab.id && (
-                  <View
+                  <div
                     style={{
                       width: 6,
                       height: 6,
@@ -312,20 +370,28 @@ export default function App() {
                     }}
                   />
                 )}
-              </TouchableOpacity>
+              </button>
             ))}
-          </View>
+          </div>
 
           {/* File list */}
-          <View style={{ flex: 1, overflow: "hidden" }}>
-            <View
+          <div
+            style={{
+              flex: 1,
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div
               style={{
-                paddingHorizontal: 12,
+                paddingLeft: 12,
+                paddingRight: 12,
                 paddingTop: 10,
                 paddingBottom: 6,
               }}
             >
-              <Text
+              <div
                 style={{
                   color: "#475569",
                   fontFamily: "monospace",
@@ -336,88 +402,109 @@ export default function App() {
                 }}
               >
                 VAULT FILES
-              </Text>
-              <TextInput
+              </div>
+              <input
                 style={{
-                  paddingHorizontal: 8,
-                  paddingVertical: 6,
+                  paddingLeft: 8,
+                  paddingRight: 8,
+                  paddingTop: 6,
+                  paddingBottom: 6,
                   backgroundColor: "#020617",
                   borderRadius: 4,
                   borderWidth: 1,
+                  borderStyle: "solid",
                   borderColor: "#1e293b",
                   color: "#94a3b8",
                   fontFamily: "monospace",
                   fontSize: 11,
+                  width: "100%",
+                  boxSizing: "border-box",
                 }}
                 value={searchTerm}
-                onChangeText={setSearchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search..."
-                placeholderTextColor="#334155"
               />
-            </View>
-            <ScrollView
-              style={{ flex: 1 }}
-              contentContainerStyle={{
-                paddingHorizontal: 12,
-                paddingBottom: 12,
-              }}
-            >
-              {filteredNodes.length === 0 && (
-                <Text
-                  style={{
-                    color: "#334155",
-                    fontFamily: "monospace",
-                    fontSize: 10,
-                    textAlign: "center",
-                    paddingTop: 20,
-                  }}
-                >
-                  {vaultPath ? "No files found" : "Open a vault to begin"}
-                </Text>
-              )}
-              {filteredNodes.map((node) => (
-                <TouchableOpacity
-                  key={node.fileName}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    paddingHorizontal: 8,
-                    paddingVertical: 7,
-                    borderRadius: 4,
-                    marginBottom: 2,
-                    backgroundColor:
-                      activeFile === node.fileName ? "#1c0a0d" : "transparent",
-                  }}
-                  onPress={() => handleSelectFile(node.fileName)}
-                >
-                  <Text
+            </div>
+            <div style={{ flex: 1, overflow: "auto" }}>
+              <div
+                style={{
+                  paddingLeft: 12,
+                  paddingRight: 12,
+                  paddingBottom: 12,
+                }}
+              >
+                {filteredNodes.length === 0 && (
+                  <div
                     style={{
-                      color: "#cbd5e1",
+                      color: "#334155",
                       fontFamily: "monospace",
                       fontSize: 10,
-                      flex: 1,
+                      textAlign: "center",
+                      paddingTop: 20,
                     }}
-                    numberOfLines={1}
                   >
-                    {node.name}
-                  </Text>
-                  <View
+                    {vaultPath ? "No files found" : "Open a vault to begin"}
+                  </div>
+                )}
+                {filteredNodes.map((node) => (
+                  <button
+                    key={node.fileName}
+                    type="button"
                     style={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: 3,
-                      backgroundColor: typeColor[node.type] ?? "#475569",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      paddingLeft: 8,
+                      paddingRight: 8,
+                      paddingTop: 7,
+                      paddingBottom: 7,
+                      borderRadius: 4,
+                      marginBottom: 2,
+                      backgroundColor:
+                        activeFile === node.fileName
+                          ? "#1c0a0d"
+                          : "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      width: "100%",
                     }}
-                  />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        </View>
+                    onClick={() => handleSelectFile(node.fileName)}
+                  >
+                    <div
+                      style={{
+                        color: "#cbd5e1",
+                        fontFamily: "monospace",
+                        fontSize: 10,
+                        flex: 1,
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis",
+                        textAlign: "left",
+                      }}
+                    >
+                      {node.name}
+                    </div>
+                    <div
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: 3,
+                        backgroundColor: typeColor[node.type] ?? "#475569",
+                        flexShrink: 0,
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Tab content */}
-        <View style={{ flex: 1 }}>
+        <div
+          style={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0 }}
+        >
           {activeTab === "crazyboard" && (
             <CrazyBoard
               nodes={nodes}
@@ -444,8 +531,8 @@ export default function App() {
               onVaultRefresh={loadVault}
             />
           )}
-        </View>
-      </View>
-    </View>
+        </div>
+      </div>
+    </div>
   );
 }

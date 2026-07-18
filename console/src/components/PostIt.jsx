@@ -1,5 +1,3 @@
-import { View, Text, TouchableOpacity } from "react-native";
-
 const COLORS = {
   yellow: { bg: "#fef08a", text: "#713f12", border: "#fde047" },
   pink: { bg: "#fbcfe8", text: "#831843", border: "#f9a8d4" },
@@ -11,24 +9,20 @@ export default function PostIt({ note, onDragStart, onRemove }) {
   const colors = COLORS[note.color] ?? COLORS.yellow;
 
   return (
-    <View
+    <div
       style={{
         position: "absolute",
         left: note.x,
         top: note.y,
         width: 200,
-        transform: [{ rotate: `${note.rotate ?? 0}deg` }],
+        transform: `rotate(${note.rotate ?? 0}deg)`,
         backgroundColor: colors.bg,
-        borderWidth: 1,
-        borderColor: colors.border,
-        shadowColor: "#000",
-        shadowOpacity: 0.3,
-        shadowRadius: 6,
+        border: `1px solid ${colors.border}`,
+        boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
         padding: 14,
       }}
     >
-      {/* Tape strip -- semi-transparent so bg shows through */}
-      <View
+      <div
         style={{
           position: "absolute",
           top: -8,
@@ -37,16 +31,12 @@ export default function PostIt({ note, onDragStart, onRemove }) {
           width: 48,
           height: 16,
           backgroundColor: "rgba(255,255,255,0.5)",
-          borderWidth: 1,
-          borderColor: "rgba(200,200,200,0.4)",
+          border: "1px solid rgba(200,200,200,0.4)",
         }}
       />
 
-      <View
-        onStartShouldSetResponder={() => true}
-        onResponderGrant={onDragStart}
-      >
-        <Text
+      <div onMouseDown={onDragStart}>
+        <div
           style={{
             color: colors.text,
             fontFamily: "serif",
@@ -57,21 +47,21 @@ export default function PostIt({ note, onDragStart, onRemove }) {
           }}
         >
           "{note.text}"
-        </Text>
-      </View>
+        </div>
+      </div>
 
-      <View
+      <div
         style={{
+          display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
           marginTop: 12,
           paddingTop: 8,
-          borderTopWidth: 1,
-          borderTopColor: "rgba(0,0,0,0.1)",
+          borderTop: "1px solid rgba(0,0,0,0.1)",
         }}
       >
-        <Text
+        <div
           style={{
             color: colors.text,
             fontFamily: "monospace",
@@ -80,9 +70,18 @@ export default function PostIt({ note, onDragStart, onRemove }) {
           }}
         >
           CLUE
-        </Text>
-        <TouchableOpacity onPress={onRemove}>
-          <Text
+        </div>
+        <button
+          type="button"
+          onClick={onRemove}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 0,
+          }}
+        >
+          <div
             style={{
               color: colors.text,
               fontFamily: "monospace",
@@ -91,9 +90,9 @@ export default function PostIt({ note, onDragStart, onRemove }) {
             }}
           >
             remove
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          </div>
+        </button>
+      </div>
+    </div>
   );
 }

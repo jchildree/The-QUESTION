@@ -1,4 +1,3 @@
-import { View, Text, TouchableOpacity } from "react-native";
 import { getConfidenceColor } from "../lib/vaultParser";
 
 const CARD_TYPES = {
@@ -43,97 +42,107 @@ export default function Card({
   const colors = CARD_TYPES[node.type] ?? CARD_TYPES.Index;
   const confidenceColor = getConfidenceColor(node.confidence);
 
-  const cardStyle = {
-    position: "absolute",
-    left: position.x,
-    top: position.y,
-    width: 280,
-    transform: [{ rotate: `${position.rotate ?? 0}deg` }],
-    backgroundColor: "#0f172a",
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: isSelected ? "#f43f5e" : colors.border,
-    shadowColor: "#000",
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: confidenceColor,
-  };
-
   return (
-    <TouchableOpacity style={cardStyle} onPress={onPress} activeOpacity={1}>
+    <div
+      style={{
+        position: "absolute",
+        left: position.x,
+        top: position.y,
+        width: 280,
+        transform: `rotate(${position.rotate ?? 0}deg)`,
+        backgroundColor: "#0f172a",
+        borderRadius: 8,
+        border: `2px solid ${isSelected ? "#f43f5e" : colors.border}`,
+        borderLeft: `4px solid ${confidenceColor}`,
+        boxShadow: "0 8px 16px rgba(0,0,0,0.5)",
+        cursor: "pointer",
+        userSelect: "none",
+      }}
+      onClick={onPress}
+    >
       {/* Pushpin */}
-      <View
+      <div
         style={{
           position: "absolute",
           top: -14,
           left: "50%",
           marginLeft: -7,
+          display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           zIndex: 30,
         }}
       >
-        <View
+        <div
           style={{
             width: 14,
             height: 14,
             borderRadius: 7,
             backgroundColor: colors.pin,
-            borderWidth: 1,
-            borderColor: "rgba(255,255,255,0.2)",
+            border: "1px solid rgba(255,255,255,0.2)",
           }}
         />
-        <View style={{ width: 2, height: 12, backgroundColor: "#475569" }} />
-      </View>
+        <div style={{ width: 2, height: 12, backgroundColor: "#475569" }} />
+      </div>
 
       {/* Header drag handle */}
-      <View
+      <div
         style={{
+          display: "flex",
           padding: 10,
           borderTopLeftRadius: 6,
           borderTopRightRadius: 6,
           backgroundColor: colors.header,
-          borderBottomWidth: 1,
-          borderBottomColor: `${colors.border}40`,
+          borderBottom: `1px solid ${colors.border}40`,
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
         }}
-        onStartShouldSetResponder={() => true}
-        onResponderGrant={onDragStart}
+        onMouseDown={onDragStart}
       >
-        <Text
+        <div
           style={{
             color: colors.headerText,
             fontFamily: "monospace",
             fontSize: 11,
             fontWeight: "bold",
             flex: 1,
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
           }}
-          numberOfLines={1}
         >
           {node.name}
-        </Text>
-        <Text
+        </div>
+        <div
           style={{
             color: colors.headerText,
             fontFamily: "monospace",
             fontSize: 9,
             backgroundColor: "#0f172a",
-            paddingHorizontal: 4,
-            paddingVertical: 2,
+            paddingLeft: 4,
+            paddingRight: 4,
+            paddingTop: 2,
+            paddingBottom: 2,
             borderRadius: 3,
           }}
         >
           {node.type.toUpperCase()}
-        </Text>
-      </View>
+        </div>
+      </div>
 
       {/* Body */}
-      <View style={{ padding: 12, gap: 8 }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          padding: 12,
+          gap: 8,
+        }}
+      >
         {node.type === "Case" && (
-          <View>
-            <Text
+          <div>
+            <div
               style={{
                 color: "#94a3b8",
                 fontSize: 10,
@@ -141,8 +150,8 @@ export default function Card({
               }}
             >
               STATUS
-            </Text>
-            <Text
+            </div>
+            <div
               style={{
                 color: "#fda4af",
                 fontSize: 11,
@@ -152,12 +161,12 @@ export default function Card({
               }}
             >
               {node.status ?? "Open"}
-            </Text>
-          </View>
+            </div>
+          </div>
         )}
         {node.type === "Suspect" && (
-          <View>
-            <Text
+          <div>
+            <div
               style={{
                 color: "#94a3b8",
                 fontSize: 10,
@@ -165,8 +174,8 @@ export default function Card({
               }}
             >
               VERDICT
-            </Text>
-            <Text
+            </div>
+            <div
               style={{
                 color: "#fcd34d",
                 fontSize: 11,
@@ -175,11 +184,18 @@ export default function Card({
               }}
             >
               {node.verdict ?? "Untested"}
-            </Text>
-          </View>
+            </div>
+          </div>
         )}
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-          <View
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <div
             style={{
               width: 8,
               height: 8,
@@ -187,42 +203,47 @@ export default function Card({
               backgroundColor: confidenceColor,
             }}
           />
-          <Text
+          <div
             style={{ color: "#64748b", fontSize: 9, fontFamily: "monospace" }}
           >
             {(node.confidence ?? "unknown").toUpperCase()}
-          </Text>
-        </View>
-        <Text
-          style={{ color: "#475569", fontSize: 9, fontFamily: "monospace" }}
-        >
+          </div>
+        </div>
+        <div style={{ color: "#475569", fontSize: 9, fontFamily: "monospace" }}>
           {node.links?.length ?? 0} links
-        </Text>
-      </View>
+        </div>
+      </div>
 
       {/* Footer actions */}
-      <View
+      <div
         style={{
+          display: "flex",
           flexDirection: "row",
           padding: 8,
           gap: 6,
-          borderTopWidth: 1,
-          borderTopColor: "#1e293b",
+          borderTop: "1px solid #1e293b",
         }}
       >
-        <TouchableOpacity
+        <button
+          type="button"
           style={{
             flex: 1,
-            paddingVertical: 6,
+            paddingTop: 6,
+            paddingBottom: 6,
+            display: "flex",
             alignItems: "center",
+            justifyContent: "center",
             backgroundColor: isLinking ? "#4c0519" : "#1e293b",
             borderRadius: 4,
-            borderWidth: 1,
-            borderColor: isLinking ? "#f43f5e" : "#334155",
+            border: `1px solid ${isLinking ? "#f43f5e" : "#334155"}`,
+            cursor: "pointer",
           }}
-          onPress={isLinkTarget ? onCompleteLink : onStartLink}
+          onClick={(e) => {
+            e.stopPropagation();
+            isLinkTarget ? onCompleteLink() : onStartLink();
+          }}
         >
-          <Text
+          <div
             style={{
               color: isLinking ? "#f43f5e" : "#94a3b8",
               fontSize: 9,
@@ -235,27 +256,35 @@ export default function Card({
               : isLinking
                 ? "LINKING..."
                 : "YARN CORD"}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+          </div>
+        </button>
+        <button
+          type="button"
           style={{
-            paddingHorizontal: 10,
-            paddingVertical: 6,
+            paddingLeft: 10,
+            paddingRight: 10,
+            paddingTop: 6,
+            paddingBottom: 6,
+            display: "flex",
             alignItems: "center",
+            justifyContent: "center",
             backgroundColor: "#1e293b",
             borderRadius: 4,
-            borderWidth: 1,
-            borderColor: "#334155",
+            border: "1px solid #334155",
+            cursor: "pointer",
           }}
-          onPress={onOpenEditor}
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenEditor();
+          }}
         >
-          <Text
+          <div
             style={{ color: "#94a3b8", fontSize: 9, fontFamily: "monospace" }}
           >
             EDIT
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
+          </div>
+        </button>
+      </div>
+    </div>
   );
 }
