@@ -3,8 +3,8 @@ import Card from "../components/Card";
 import YarnCanvas from "../components/YarnCanvas";
 import PostIt from "../components/PostIt";
 
-const BOARD_WIDTH = 2200;
-const BOARD_HEIGHT = 1200;
+const BOARD_MIN_WIDTH = 2200;
+const BOARD_MIN_HEIGHT = 1200;
 
 export default function CrazyBoard({
   nodes,
@@ -46,12 +46,12 @@ export default function CrazyBoard({
     setPositions((prev) => {
       const updated = { ...prev };
       let changed = false;
-      nodes.forEach((node, i) => {
+      nodes.forEach((node) => {
         if (!updated[node.fileName]) {
           updated[node.fileName] = {
-            x: 150 + (i % 4) * 320,
-            y: 100 + Math.floor(i / 4) * 280,
-            rotate: i % 3 === 0 ? -1 : i % 3 === 1 ? 1 : -2,
+            x: 80 + Math.random() * (BOARD_MIN_WIDTH - 420),
+            y: 60 + Math.random() * (BOARD_MIN_HEIGHT - 280),
+            rotate: (Math.random() - 0.5) * 18,
           };
           changed = true;
         }
@@ -68,6 +68,16 @@ export default function CrazyBoard({
     })),
     ...manualEdges,
   ];
+
+  const posValues = Object.values(positions);
+  const boardWidth = Math.max(
+    BOARD_MIN_WIDTH,
+    ...posValues.map((p) => p.x + 420)
+  );
+  const boardHeight = Math.max(
+    BOARD_MIN_HEIGHT,
+    ...posValues.map((p) => p.y + 300)
+  );
 
   const handleDragStart = useCallback(
     (e, id, type) => {
@@ -108,14 +118,14 @@ export default function CrazyBoard({
       const x = Math.max(
         10,
         Math.min(
-          BOARD_WIDTH - 290,
+          boardWidth - 290,
           e.clientX - (rect?.left ?? 0) + scrollLeft - dragging.offsetX
         )
       );
       const y = Math.max(
         10,
         Math.min(
-          BOARD_HEIGHT - 200,
+          boardHeight - 200,
           e.clientY - (rect?.top ?? 0) + scrollTop - dragging.offsetY
         )
       );
@@ -131,7 +141,7 @@ export default function CrazyBoard({
         );
       }
     },
-    [dragging]
+    [dragging, boardWidth, boardHeight]
   );
 
   const handleMouseUp = useCallback(() => setDragging(null), []);
@@ -214,6 +224,7 @@ export default function CrazyBoard({
     setPostIts((prev) => prev.map((n) => (n.id === id ? { ...n, text } : n)));
   }, []);
 
+  const cardScale = Math.max(0.55, 1 - Math.max(0, nodes.length - 8) * 0.025);
   const caseCount = nodes.filter((n) => n.type === "Case").length;
   const suspectCount = nodes.filter((n) => n.type === "Suspect").length;
   const sourceCount = nodes.filter((n) => n.type === "Source").length;
@@ -418,8 +429,8 @@ export default function CrazyBoard({
       >
         <div
           style={{
-            width: BOARD_WIDTH,
-            height: BOARD_HEIGHT,
+            width: boardWidth,
+            height: boardHeight,
             position: "relative",
             backgroundImage:
               "radial-gradient(rgba(244,63,94,0.06) 1.5px, transparent 1.5px)",
@@ -430,8 +441,8 @@ export default function CrazyBoard({
             edges={allEdges}
             positions={positions}
             onRemoveEdge={handleRemoveEdge}
-            boardWidth={BOARD_WIDTH}
-            boardHeight={BOARD_HEIGHT}
+            boardWidth={boardWidth}
+            boardHeight={boardHeight}
           />
 
           {nodes.map((node) => {
@@ -444,7 +455,7 @@ export default function CrazyBoard({
               <Card
                 key={node.fileName}
                 node={node}
-                position={pos}
+                position={{ ...pos, scale: cardScale }}
                 isSelected={activeFile === node.fileName}
                 isLinking={linkingSource === node.fileName}
                 isLinkTarget={
