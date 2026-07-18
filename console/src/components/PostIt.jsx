@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const COLORS = {
   yellow: { bg: "#fef08a", text: "#713f12", border: "#fde047" },
   pink: { bg: "#fbcfe8", text: "#831843", border: "#f9a8d4" },
@@ -5,12 +7,21 @@ const COLORS = {
   blue: { bg: "#bae6fd", text: "#0c4a6e", border: "#7dd3fc" },
 };
 
-export default function PostIt({ note, onDragStart, onRemove }) {
+export default function PostIt({ note, onDragStart, onRemove, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(note.text);
   const colors = COLORS[note.color] ?? COLORS.yellow;
+
+  const commitEdit = () => {
+    const trimmed = draft.trim();
+    if (trimmed && trimmed !== note.text) onUpdate(trimmed);
+    else setDraft(note.text);
+    setEditing(false);
+  };
 
   return (
     <div
-      onMouseDown={onDragStart}
+      onMouseDown={editing ? undefined : onDragStart}
       style={{
         position: "absolute",
         left: note.x,
@@ -22,7 +33,7 @@ export default function PostIt({ note, onDragStart, onRemove }) {
         border: `1px solid ${colors.border}`,
         boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
         padding: 14,
-        cursor: "grab",
+        cursor: editing ? "default" : "grab",
         userSelect: "none",
       }}
     >
@@ -39,19 +50,60 @@ export default function PostIt({ note, onDragStart, onRemove }) {
         }}
       />
 
-      <div
-        style={{
-          color: colors.text,
-          fontFamily: "serif",
-          fontStyle: "italic",
-          fontSize: 13,
-          lineHeight: "1.5",
-          wordBreak: "break-word",
-          marginTop: 8,
-        }}
-      >
-        "{note.text}"
-      </div>
+      {editing ? (
+        <textarea
+          autoFocus
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onMouseDown={(e) => e.stopPropagation()}
+          onBlur={commitEdit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              commitEdit();
+            }
+            if (e.key === "Escape") {
+              setDraft(note.text);
+              setEditing(false);
+            }
+          }}
+          style={{
+            width: "100%",
+            minHeight: 60,
+            marginTop: 8,
+            background: "none",
+            border: "none",
+            outline: "1px solid rgba(0,0,0,0.2)",
+            borderRadius: 2,
+            color: colors.text,
+            fontFamily: "serif",
+            fontStyle: "italic",
+            fontSize: 13,
+            lineHeight: "1.5",
+            resize: "none",
+            padding: 2,
+            boxSizing: "border-box",
+          }}
+        />
+      ) : (
+        <div
+          onDoubleClick={() => {
+            setDraft(note.text);
+            setEditing(true);
+          }}
+          style={{
+            color: colors.text,
+            fontFamily: "serif",
+            fontStyle: "italic",
+            fontSize: 13,
+            lineHeight: "1.5",
+            wordBreak: "break-word",
+            marginTop: 8,
+          }}
+        >
+          "{note.text}"
+        </div>
+      )}
 
       <div
         style={{

@@ -18,6 +18,7 @@ export default function CrazyBoard({
   setPositions,
   manualEdges,
   setManualEdges,
+  vaultPath,
 }) {
   const [postIts, setPostIts] = useState([]);
   const [dragging, setDragging] = useState(null);
@@ -26,10 +27,12 @@ export default function CrazyBoard({
   const [postItInput, setPostItInput] = useState(null);
 
   useEffect(() => {
+    setPostIts([]);
+    if (!vaultPath) return;
     window.electronAPI?.readPostIts?.().then((saved) => {
       if (saved?.length) setPostIts(saved);
     });
-  }, []);
+  }, [vaultPath]);
 
   // ponytail: debounce prevents a store write on every mousemove during drag
   useEffect(() => {
@@ -205,6 +208,10 @@ export default function CrazyBoard({
 
   const handleRemovePostIt = useCallback((id) => {
     setPostIts((prev) => prev.filter((n) => n.id !== id));
+  }, []);
+
+  const handleUpdatePostIt = useCallback((id, text) => {
+    setPostIts((prev) => prev.map((n) => (n.id === id ? { ...n, text } : n)));
   }, []);
 
   const caseCount = nodes.filter((n) => n.type === "Case").length;
@@ -458,6 +465,7 @@ export default function CrazyBoard({
               note={note}
               onDragStart={(e) => handleDragStart(e, note.id, "postit")}
               onRemove={() => handleRemovePostIt(note.id)}
+              onUpdate={(text) => handleUpdatePostIt(note.id, text)}
             />
           ))}
         </div>

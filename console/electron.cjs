@@ -141,7 +141,7 @@ ipcMain.handle("vault:read", async () => {
     }
   }
 
-  return { nodes, edges };
+  return { nodes, edges, vaultPath };
 });
 
 ipcMain.handle("vault:write", async (_event, { fileName, content }) => {
@@ -157,20 +157,28 @@ ipcMain.handle("vault:write", async (_event, { fileName, content }) => {
 });
 
 ipcMain.handle("board:read", async () => {
-  return store.get("boardLayout", { positions: {}, manualEdges: [] });
+  const vp = store.get("vaultPath");
+  if (!vp) return { positions: {}, manualEdges: [] };
+  return store.get("boardLayout:" + vp, { positions: {}, manualEdges: [] });
 });
 
 ipcMain.handle("board:write", async (_event, layout) => {
-  store.set("boardLayout", layout);
+  const vp = store.get("vaultPath");
+  if (!vp) return { ok: false };
+  store.set("boardLayout:" + vp, layout);
   return { ok: true };
 });
 
 ipcMain.handle("postits:read", async () => {
-  return store.get("postIts", []);
+  const vp = store.get("vaultPath");
+  if (!vp) return [];
+  return store.get("postIts:" + vp, []);
 });
 
 ipcMain.handle("postits:write", async (_event, postIts) => {
-  store.set("postIts", postIts);
+  const vp = store.get("vaultPath");
+  if (!vp) return { ok: false };
+  store.set("postIts:" + vp, postIts);
   return { ok: true };
 });
 

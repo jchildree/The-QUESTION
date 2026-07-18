@@ -245,7 +245,7 @@ export default function VicSageTerminal({
                   color: "#cbd5e1",
                   fontFamily: "monospace",
                   fontSize: 13,
-                  lineHeight: 22,
+                  lineHeight: "1.6",
                 }}
               >
                 {msg.text}
@@ -278,7 +278,7 @@ export default function VicSageTerminal({
                   color: "#cbd5e1",
                   fontFamily: "monospace",
                   fontSize: 13,
-                  lineHeight: 22,
+                  lineHeight: "1.6",
                 }}
               >
                 {streamBuffer || "..."}

@@ -16,6 +16,7 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [boardPositions, setBoardPositions] = useState({});
   const [boardManualEdges, setBoardManualEdges] = useState([]);
+  const [newFileForm, setNewFileForm] = useState(null);
 
   useEffect(() => {
     loadVault();
@@ -24,11 +25,16 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (!vaultPath) {
+      setBoardPositions({});
+      setBoardManualEdges([]);
+      return;
+    }
     window.electronAPI?.readBoard?.().then((saved) => {
-      if (saved?.positions) setBoardPositions(saved.positions);
-      if (saved?.manualEdges) setBoardManualEdges(saved.manualEdges);
+      setBoardPositions(saved?.positions ?? {});
+      setBoardManualEdges(saved?.manualEdges ?? []);
     });
-  }, []);
+  }, [vaultPath]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -45,6 +51,7 @@ export default function App() {
     if (result?.nodes) {
       setNodes(result.nodes);
       setEdges(result.edges ?? []);
+      if (result.vaultPath) setVaultPath(result.vaultPath);
     }
   }, []);
 
@@ -69,6 +76,22 @@ export default function App() {
     setActiveFile(fileName);
     setActiveTab("editor");
   }, []);
+
+  const handleCreateFile = useCallback(async () => {
+    if (!newFileForm?.name?.trim() || !vaultPath) return;
+    const name = newFileForm.name.trim();
+    const type = newFileForm.type;
+    const fileName = `${type} - ${name}.md`;
+    const trustDomain = vaultPath.split(/[/\\]/).pop() ?? "vault";
+    const slug = name.toLowerCase().replace(/\s+/g, "-");
+    const kind = type.toLowerCase();
+    const today = new Date().toISOString().split("T")[0];
+    const content = `---\nid: spiffe://${trustDomain}/case-zero/${kind}/${slug}\nasserted: ${today}\nsource: user\nmethod: asserted\nconfidence: unverified\nverify: ""\n---\n\n# ${name}\n`;
+    await handleWriteFile(fileName, content);
+    setNewFileForm(null);
+    await loadVault();
+    handleOpenEditor(fileName);
+  }, [newFileForm, vaultPath, handleWriteFile, loadVault, handleOpenEditor]);
 
   const activeNode = nodes.find((n) => n.fileName === activeFile) ?? null;
 
@@ -411,16 +434,127 @@ export default function App() {
             >
               <div
                 style={{
-                  color: "#475569",
-                  fontFamily: "monospace",
-                  fontSize: 9,
-                  fontWeight: "bold",
-                  letterSpacing: 2,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
                   marginBottom: 8,
                 }}
               >
-                VAULT FILES
+                <div
+                  style={{
+                    color: "#475569",
+                    fontFamily: "monospace",
+                    fontSize: 9,
+                    fontWeight: "bold",
+                    letterSpacing: 2,
+                  }}
+                >
+                  VAULT FILES
+                </div>
+                {vaultPath && (
+                  <button
+                    type="button"
+                    style={{
+                      background: "none",
+                      border: "1px solid #334155",
+                      borderRadius: 3,
+                      cursor: "pointer",
+                      padding: "0 5px",
+                      lineHeight: "16px",
+                      color: "#64748b",
+                      fontFamily: "monospace",
+                      fontSize: 12,
+                    }}
+                    onClick={() =>
+                      setNewFileForm(
+                        newFileForm ? null : { name: "", type: "Case" }
+                      )
+                    }
+                  >
+                    {newFileForm ? "x" : "+"}
+                  </button>
+                )}
               </div>
+
+              {newFileForm && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                    marginBottom: 8,
+                    padding: 8,
+                    backgroundColor: "#0f172a",
+                    borderRadius: 4,
+                    border: "1px solid #1e293b",
+                  }}
+                >
+                  <input
+                    autoFocus
+                    style={{
+                      padding: "4px 6px",
+                      backgroundColor: "#020617",
+                      borderRadius: 3,
+                      border: "1px solid #334155",
+                      color: "#e2e8f0",
+                      fontFamily: "monospace",
+                      fontSize: 10,
+                      outline: "none",
+                    }}
+                    value={newFileForm.name}
+                    onChange={(e) =>
+                      setNewFileForm((f) => ({ ...f, name: e.target.value }))
+                    }
+                    placeholder="File name..."
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleCreateFile();
+                      if (e.key === "Escape") setNewFileForm(null);
+                    }}
+                  />
+                  <div
+                    style={{ display: "flex", flexDirection: "row", gap: 4 }}
+                  >
+                    <select
+                      style={{
+                        flex: 1,
+                        padding: "3px 4px",
+                        backgroundColor: "#020617",
+                        borderRadius: 3,
+                        border: "1px solid #334155",
+                        color: "#94a3b8",
+                        fontFamily: "monospace",
+                        fontSize: 10,
+                      }}
+                      value={newFileForm.type}
+                      onChange={(e) =>
+                        setNewFileForm((f) => ({ ...f, type: e.target.value }))
+                      }
+                    >
+                      <option value="Case">Case</option>
+                      <option value="Suspect">Suspect</option>
+                      <option value="Source">Source</option>
+                    </select>
+                    <button
+                      type="button"
+                      style={{
+                        padding: "3px 8px",
+                        backgroundColor: "#1e293b",
+                        borderRadius: 3,
+                        border: "1px solid #334155",
+                        cursor: "pointer",
+                        color: "#94a3b8",
+                        fontFamily: "monospace",
+                        fontSize: 10,
+                      }}
+                      onClick={handleCreateFile}
+                    >
+                      CREATE
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <input
                 style={{
                   paddingLeft: 8,
@@ -536,6 +670,7 @@ export default function App() {
               setPositions={setBoardPositions}
               manualEdges={boardManualEdges}
               setManualEdges={setBoardManualEdges}
+              vaultPath={vaultPath}
             />
           )}
           {activeTab === "editor" && (
