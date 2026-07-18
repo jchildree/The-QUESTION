@@ -6,6 +6,16 @@ import PostIt from "../components/PostIt";
 const BOARD_MIN_WIDTH = 2200;
 const BOARD_MIN_HEIGHT = 1200;
 
+const TYPE_META = {
+  Case: { color: "#f43f5e", bg: "#1c0a0d" },
+  Suspect: { color: "#f59e0b", bg: "#1c1008" },
+  Source: { color: "#06b6d4", bg: "#041214" },
+  ADR: { color: "#a78bfa", bg: "#0e0b1a" },
+  REQ: { color: "#34d399", bg: "#041a0e" },
+  Index: { color: "#94a3b8", bg: "#0d1117" },
+  README: { color: "#94a3b8", bg: "#0d1117" },
+};
+
 export default function CrazyBoard({
   nodes,
   edges,
@@ -25,6 +35,7 @@ export default function CrazyBoard({
   const boardRef = useRef(null);
   const [linkingSource, setLinkingSource] = useState(null);
   const [postItInput, setPostItInput] = useState(null);
+  const [hiddenTypes, setHiddenTypes] = useState(new Set());
 
   useEffect(() => {
     setPostIts([]);
@@ -78,6 +89,25 @@ export default function CrazyBoard({
     BOARD_MIN_HEIGHT,
     ...posValues.map((p) => p.y + 300)
   );
+
+  const visibleNodes = nodes.filter((n) => !hiddenTypes.has(n.type));
+  const visibleFileNames = new Set(visibleNodes.map((n) => n.fileName));
+  const visibleEdges = allEdges.filter(
+    (e) => visibleFileNames.has(e.from) && visibleFileNames.has(e.to)
+  );
+
+  const presentTypes = [...new Set(nodes.map((n) => n.type))].filter(
+    (t) => TYPE_META[t]
+  );
+
+  const toggleType = useCallback((type) => {
+    setHiddenTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) next.delete(type);
+      else next.add(type);
+      return next;
+    });
+  }, []);
 
   const handleDragStart = useCallback(
     (e, id, type) => {
@@ -225,9 +255,51 @@ export default function CrazyBoard({
   }, []);
 
   const cardScale = Math.max(0.55, 1 - Math.max(0, nodes.length - 8) * 0.025);
-  const caseCount = nodes.filter((n) => n.type === "Case").length;
-  const suspectCount = nodes.filter((n) => n.type === "Suspect").length;
-  const sourceCount = nodes.filter((n) => n.type === "Source").length;
+
+  const statItems = [
+    {
+      count: nodes.filter((n) => n.type === "Case").length,
+      label: "CASES",
+      color: "#f43f5e",
+      bg: "#1c0a0d",
+    },
+    {
+      count: nodes.filter((n) => n.type === "Suspect").length,
+      label: "SUSPECTS",
+      color: "#f59e0b",
+      bg: "#1c1008",
+    },
+    {
+      count: nodes.filter((n) => n.type === "Source").length,
+      label: "SOURCES",
+      color: "#06b6d4",
+      bg: "#041214",
+    },
+    {
+      count: nodes.filter((n) => n.type === "ADR").length,
+      label: "ADR",
+      color: "#a78bfa",
+      bg: "#0e0b1a",
+    },
+    {
+      count: nodes.filter((n) => n.type === "REQ").length,
+      label: "REQ",
+      color: "#34d399",
+      bg: "#041a0e",
+    },
+    {
+      count: nodes.filter((n) => n.type === "Index").length,
+      label: "INDEX",
+      color: "#94a3b8",
+      bg: "#0d1117",
+    },
+    {
+      count: postIts.length,
+      label: "STICKIES",
+      color: "#fef08a",
+      bg: "#1c1a08",
+    },
+  ];
 
   return (
     <div
@@ -281,6 +353,21 @@ export default function CrazyBoard({
             }}
           >
             CRAZY WALL
+          </div>
+          <div
+            style={{
+              background: "#020617",
+              border: "1px solid #f43f5e",
+              color: "#f43f5e",
+              fontFamily: "monospace",
+              fontSize: 9,
+              fontWeight: "bold",
+              padding: "2px 8px",
+              borderRadius: 3,
+              letterSpacing: 1,
+            }}
+          >
+            {visibleEdges.length} STRINGS
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "row", gap: 8 }}>
@@ -414,6 +501,67 @@ export default function CrazyBoard({
         </div>
       </div>
 
+      {/* Type filter row */}
+      {presentTypes.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+            paddingLeft: 16,
+            paddingRight: 16,
+            paddingTop: 6,
+            paddingBottom: 6,
+            backgroundColor: "#0a0f1e",
+            borderBottom: "1px solid #1e293b",
+          }}
+        >
+          <div
+            style={{
+              color: "#334155",
+              fontFamily: "monospace",
+              fontSize: 9,
+              fontWeight: "bold",
+              letterSpacing: 1,
+              marginRight: 4,
+              whiteSpace: "nowrap",
+            }}
+          >
+            SHOW
+          </div>
+          {presentTypes.map((type) => {
+            const meta = TYPE_META[type];
+            const active = !hiddenTypes.has(type);
+            return (
+              <button
+                key={type}
+                type="button"
+                onClick={() => toggleType(type)}
+                style={{
+                  paddingLeft: 10,
+                  paddingRight: 10,
+                  paddingTop: 3,
+                  paddingBottom: 3,
+                  borderRadius: 12,
+                  border: `1px solid ${active ? meta.color : "#1e293b"}`,
+                  backgroundColor: active ? meta.bg : "transparent",
+                  color: active ? meta.color : "#334155",
+                  fontFamily: "monospace",
+                  fontSize: 9,
+                  fontWeight: "bold",
+                  letterSpacing: 1,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                {type.toUpperCase()}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Scrollable corkboard */}
       <div
         ref={boardRef}
@@ -438,14 +586,14 @@ export default function CrazyBoard({
           }}
         >
           <YarnCanvas
-            edges={allEdges}
+            edges={visibleEdges}
             positions={positions}
             onRemoveEdge={handleRemoveEdge}
             boardWidth={boardWidth}
             boardHeight={boardHeight}
           />
 
-          {nodes.map((node) => {
+          {visibleNodes.map((node) => {
             const pos = positions[node.fileName] ?? {
               x: 100,
               y: 100,
@@ -491,38 +639,12 @@ export default function CrazyBoard({
           paddingBottom: 10,
           paddingLeft: 16,
           paddingRight: 16,
-          gap: 12,
+          gap: 8,
           backgroundColor: "#020617",
           borderTop: "1px solid #0f172a",
         }}
       >
-        {[
-          { count: caseCount, label: "CASES", color: "#f43f5e", bg: "#1c0a0d" },
-          {
-            count: suspectCount,
-            label: "SUSPECTS",
-            color: "#f59e0b",
-            bg: "#1c1008",
-          },
-          {
-            count: sourceCount,
-            label: "SOURCES",
-            color: "#06b6d4",
-            bg: "#041214",
-          },
-          {
-            count: allEdges.length,
-            label: "YARN STRINGS",
-            color: "#f43f5e",
-            bg: "#1c0a0d",
-          },
-          {
-            count: postIts.length,
-            label: "STICKIES",
-            color: "#fef08a",
-            bg: "#1c1a08",
-          },
-        ].map(({ count, label, color, bg }) => (
+        {statItems.map(({ count, label, color, bg }) => (
           <div
             key={label}
             style={{
