@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-18T00:00:00Z",
+  "title": "Design System: The Question",
+  "extensions": {
+    "colorMeta": {
+      "near-black": {
+        "role": "neutral",
+        "displayName": "Near-Black",
+        "canonical": "oklch(12% 0.012 55)",
+        "tonalRamp": [
+          "oklch(8% 0.010 55)",
+          "oklch(12% 0.012 55)",
+          "oklch(17% 0.012 55)",
+          "oklch(24% 0.012 55)",
+          "oklch(33% 0.010 55)",
+          "oklch(44% 0.009 55)",
+          "oklch(57% 0.008 55)",
+          "oklch(72% 0.007 55)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Raised Surface",
+        "canonical": "oklch(17% 0.012 55)",
+        "tonalRamp": [
+          "oklch(10% 0.010 55)",
+          "oklch(15% 0.012 55)",
+          "oklch(20% 0.012 55)",
+          "oklch(28% 0.011 55)",
+          "oklch(38% 0.010 55)",
+          "oklch(50% 0.009 55)",
+          "oklch(64% 0.008 55)",
+          "oklch(80% 0.006 55)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Investigation Ink",
+        "canonical": "oklch(93% 0.006 55)",
+        "tonalRamp": [
+          "oklch(20% 0.006 55)",
+          "oklch(33% 0.006 55)",
+          "oklch(46% 0.006 55)",
+          "oklch(58% 0.006 55)",
+          "oklch(70% 0.006 55)",
+          "oklch(80% 0.006 55)",
+          "oklch(88% 0.006 55)",
+          "oklch(93% 0.006 55)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Evidence",
+        "canonical": "oklch(52% 0.008 55)",
+        "tonalRamp": [
+          "oklch(15% 0.008 55)",
+          "oklch(24% 0.008 55)",
+          "oklch(33% 0.008 55)",
+          "oklch(42% 0.008 55)",
+          "oklch(52% 0.008 55)",
+          "oklch(63% 0.008 55)",
+          "oklch(74% 0.007 55)",
+          "oklch(86% 0.006 55)"
+        ]
+      },
+      "amber-accent": {
+        "role": "primary",
+        "displayName": "Deep Lamp Amber",
+        "canonical": "oklch(70% 0.15 65)",
+        "tonalRamp": [
+          "oklch(20% 0.10 65)",
+          "oklch(30% 0.12 65)",
+          "oklch(42% 0.14 65)",
+          "oklch(54% 0.15 65)",
+          "oklch(64% 0.15 65)",
+          "oklch(70% 0.15 65)",
+          "oklch(78% 0.13 65)",
+          "oklch(88% 0.09 65)"
+        ]
+      },
+      "redline": {
+        "role": "secondary",
+        "displayName": "Caseline Red",
+        "canonical": "oklch(58% 0.18 30)",
+        "tonalRamp": [
+          "oklch(18% 0.12 30)",
+          "oklch(28% 0.15 30)",
+          "oklch(38% 0.17 30)",
+          "oklch(48% 0.18 30)",
+          "oklch(58% 0.18 30)",
+          "oklch(67% 0.16 30)",
+          "oklch(76% 0.13 30)",
+          "oklch(87% 0.08 30)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Case titles, report headings, investigation board headers. One per view."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Skill output text, finding narratives, report prose. Max 65-72ch."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Provenance IDs, SPIFFE URIs, error strings, verify commands, timestamps."
+      }
+    }
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "The Conspiracy Board Under Lamplight",
+    "overview": "The Question's visual identity starts from a single image: a detective's board at 2am, pinned evidence under a single amber bulb, near-black everywhere else. Nothing decorative. Nothing warm by default. The surface is dark not as an aesthetic choice but as an environmental fact -- this is where investigations happen, not where products are sold.\n\nThe editorial references are Daring Fireball (precision in prose, typographic restraint, no visual noise), Tufte (information density as respect for the reader, the fewest marks that carry the most meaning), and Le Carre (cold procedural intelligence; warmth earned only by stakes, never by styling). The system borrows the patience of long-form investigative writing and the density of technical documentation.\n\nThe voice follows the same rule as the investigation: function over costume. Brand identity is carried by restraint and precision, not by decoration.",
+    "keyCharacteristics": [
+      "Drenched near-black: the surface dominates; color appears only to signal meaning",
+      "Single amber accent: reserved for findings, evidence, active investigation state",
+      "Editorial typographic hierarchy: serif display + readable body + mono for data",
+      "Flat by default: depth through tonal layering, not shadows",
+      "No warmth by default: tinted neutrals trend toward cool, never cream or sand"
+    ],
+    "rules": [
+      {
+        "name": "The Lamplight Rule",
+        "body": "Amber appears only when something has earned attention: a finding, an active state, a verified claim. Apply it to fewer than 10% of any screen. The moment it decorates, it stops signaling.",
+        "section": "colors"
+      },
+      {
+        "name": "The No-Warmth Rule",
+        "body": "Tinted neutrals track toward cool, never warm. The warm-neutral band (cream, sand, paper, linen) is the AI-assistant default of 2026. Any near-white background that reads as cream has broken this rule.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono Contract",
+        "body": "Provenance IDs, SPIFFE URIs, error strings, and verify commands must always render in mono. Substituting a sans-serif for readability breaks the evidence chain visually: the reader can no longer distinguish data to be run from prose to be read.",
+        "section": "typography"
+      },
+      {
+        "name": "The No-Eyebrow Rule",
+        "body": "No small-caps tracked labels above section headings as structural scaffolding. Labels earn their place only when they signal investigation state (VERIFIED, BLOCKED, CRITICAL). Decorative kickers are the AI-scaffold tell.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Surfaces are flat at rest. A shadow or glow appears only as a direct response to state: active, hover, pinned. Any decorative shadow that appears without user interaction has broken this rule.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use amber-accent exclusively to signal meaning: active findings, verified claims, current investigation focus.",
+      "Do use Raised Surface (oklch(17% 0.012 55)) for container separation. No border, no shadow -- tonal contrast only at rest.",
+      "Do render all provenance IDs, SPIFFE URIs, error strings, and verify commands in Berkeley Mono or fallback mono.",
+      "Do cap body text at 65-72ch.",
+      "Do default to high-contrast dark mode. WCAG 2.1 AA is the floor; aim for AAA on primary reading surfaces.",
+      "Do treat persona, board, and provenance as enhancements. The underlying skill output must be readable if a UI layer is unavailable."
+    ],
+    "donts": [
+      "Don't use GitHub Copilot UI aesthetic: no warm blues, no rounded softness, no reassuring copy.",
+      "Don't accept lazy first-pass design answers. The first color or layout that comes to mind is the training-data reflex.",
+      "Don't use Obsidian-style glassmorphism or neon dark modes: no purple glows, no backdrop-filter cards used decoratively.",
+      "Don't use SaaS landing-page warmth: no cream or sand backgrounds, no gradient CTAs, no identical card-grid layouts.",
+      "Don't present a design decision without a re-runnable check.",
+      "Don't use border-left greater than 1px as a colored stripe on cards, alerts, or list items.",
+      "Don't use gradient text (background-clip: text).",
+      "Don't apply the amber accent decoratively. The Lamplight Rule is the entire point of the color system.",
+      "Don't use warm-tinted near-white (the cream/sand/paper/linen band) as a background on any surface.",
+      "Don't add uppercase tracked eyebrows above every section heading as scaffolding."
+    ]
+  }
+}
